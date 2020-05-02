@@ -17,7 +17,7 @@ import pickle, os, time
 
 RANDOM_USERAGENT = 'random'
 
-class Selenium:
+class Firefox:
     def __init__(
         self,
         id: str,
@@ -28,7 +28,7 @@ class Selenium:
         language: str = 'en-us',
         manual_set_timezone: bool = False,
         user_agent: str = None
-        ):
+    ):
         self.id = id
         cookies_folder_path = self.__cookies_folder_path(create_if_not_exists=True)
         profile = webdriver.FirefoxProfile()
