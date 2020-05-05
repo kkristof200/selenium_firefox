@@ -1,4 +1,4 @@
-from typing import Optional, NoReturn
+from typing import Optional
 
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
@@ -134,7 +134,7 @@ class Firefox:
     def get(
         self,
         url: str
-    ) -> NoReturn:
+    ) -> None:
         self.driver.get(url)
 
     def find(
@@ -175,13 +175,13 @@ class Firefox:
         except:
             return None
 
-    def save_cookies(self) -> NoReturn:
+    def save_cookies(self) -> None:
         pickle.dump(
             self.driver.get_cookies(),
             open(self.__cookies_path(), "wb")
         )
 
-    def load_cookies(self) -> NoReturn:
+    def load_cookies(self) -> None:
         if not self.has_cookies_for_current_website():
             self.save_cookies()
 
@@ -205,20 +205,20 @@ class Firefox:
         keys: str,
         min_delay: float = 0.025,
         max_delay: float = 0.25
-    ) -> NoReturn:
+    ) -> None:
         import random
 
         for key in keys:
             element.send_keys(key)
             time.sleep(random.uniform(min_delay,max_delay))
 
-    def scroll(self, amount: int) -> NoReturn:
+    def scroll(self, amount: int) -> None:
         self.driver.execute_script("window.scrollTo(0,"+str(self.current_page_offset_y()+amount)+");")
 
     def current_page_offset_y(self) -> float:
         return self.driver.execute_script("return window.pageYOffset;")
 
-    def open_new_tab(self, url: str) -> NoReturns:
+    def open_new_tab(self, url: str) -> None:
         if url is None:
             url = ""
 
@@ -229,7 +229,7 @@ class Firefox:
 
 
     # LEGACY
-    def scroll_to_bottom(self) -> NoReturn:
+    def scroll_to_bottom(self) -> None:
         MAX_TRIES = 25
         SCROLL_PAUSE_TIME = 0.5
         SCROLL_STEP_PIXELS = 5000
