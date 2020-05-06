@@ -21,6 +21,8 @@ class Firefox:
     def __init__(
         self,
         id: str,
+        cookies_folder_path: str,
+        extensions_folder_path: str,
         host: str = None,
         port: int = None,
         private: bool = False,
@@ -29,8 +31,8 @@ class Firefox:
         manual_set_timezone: bool = False,
         user_agent: str = None
     ):
+        self.cookies_folder_path = cookies_folder_path
         self.id = id
-        cookies_folder_path = self.__cookies_folder_path(create_if_not_exists=True)
         profile = webdriver.FirefoxProfile()
 
         if user_agent is not None:
@@ -82,7 +84,6 @@ class Firefox:
             self.driver.fullscreen_window()
         
         change_timezone_id = None
-        extensions_folder_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'resources/extensions')
         for (dirpath, _, filenames) in os.walk(extensions_folder_path):
             for filename in filenames:
                 if filename.endswith('.xpi') or filename.endswith('.zip'):
@@ -91,17 +92,17 @@ class Firefox:
                     if 'change_timezone' in filename:
                         change_timezone_id = addon_id
         
-        self.driver.get("about:addons")
-        self.driver.find_element_by_id("category-extension").click()
-        self.driver.execute_script("""
-            let hb = document.getElementById("html-view-browser");
-            let al = hb.contentWindow.window.document.getElementsByTagName("addon-list")[0];
-            let cards = al.getElementsByTagName("addon-card");
-            for(let card of cards){
-                card.addon.disable();
-                card.addon.enable();
-            }
-        """)
+        # self.driver.get("about:addons")
+        # self.driver.find_element_by_id("category-extension").click()
+        # self.driver.execute_script("""
+        #     let hb = document.getElementById("html-view-browser");
+        #     let al = hb.contentWindow.window.document.getElementsByTagName("addon-list")[0];
+        #     let cards = al.getElementsByTagName("addon-card");
+        #     for(let card of cards){
+        #         card.addon.disable();
+        #         card.addon.enable();
+        #     }
+        # """)
 
         while len(self.driver.window_handles) > 1:
             time.sleep(0.5)
@@ -265,23 +266,11 @@ class Firefox:
             except:
                 pass
 
-    def __cookies_folder_path(self, create_if_not_exists: bool = True) -> str:
-        path = os.path.join(
-            os.path.dirname(os.path.realpath(__file__)),
-            'resources/cookies',
-            self.id.replace('/', '_').replace(' ', '_').replace(':', '_')
-        )
-
-        if create_if_not_exists and not os.path.exists(path):
-            os.makedirs(path, exist_ok=True)
-        
-        return path
-
     def __cookies_path(self, create_folder_if_not_exists: bool = True) -> str:
         url_comps = tldextract.extract(self.driver.current_url)
         formatted_url = url_comps.domain + '.' + url_comps.suffix
 
         return os.path.join(
-            self.__cookies_folder_path(create_if_not_exists=create_folder_if_not_exists),
+            self.cookies_folder_path,
             formatted_url + '.pkl'
         )
