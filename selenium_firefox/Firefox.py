@@ -20,7 +20,6 @@ RANDOM_USERAGENT = 'random'
 class Firefox:
     def __init__(
         self,
-        id: str,
         cookies_folder_path: str,
         extensions_folder_path: str,
         host: str = None,
@@ -32,7 +31,6 @@ class Firefox:
         user_agent: str = None
     ):
         self.cookies_folder_path = cookies_folder_path
-        self.id = id
         profile = webdriver.FirefoxProfile()
 
         if user_agent is not None:
@@ -83,54 +81,60 @@ class Firefox:
         if full_screen:
             self.driver.fullscreen_window()
         
-        change_timezone_id = None
-        for (dirpath, _, filenames) in os.walk(extensions_folder_path):
-            for filename in filenames:
-                if filename.endswith('.xpi') or filename.endswith('.zip'):
-                    addon_id = self.driver.install_addon(os.path.join(dirpath, filename), temporary=False)
+        try:
+            change_timezone_id = None
+            for (dirpath, _, filenames) in os.walk(extensions_folder_path):
+                for filename in filenames:
+                    if filename.endswith('.xpi') or filename.endswith('.zip'):
+                        addon_id = self.driver.install_addon(os.path.join(dirpath, filename), temporary=False)
 
-                    if 'change_timezone' in filename:
-                        change_timezone_id = addon_id
+                        if 'change_timezone' in filename:
+                            change_timezone_id = addon_id
         
-        # self.driver.get("about:addons")
-        # self.driver.find_element_by_id("category-extension").click()
-        # self.driver.execute_script("""
-        #     let hb = document.getElementById("html-view-browser");
-        #     let al = hb.contentWindow.window.document.getElementsByTagName("addon-list")[0];
-        #     let cards = al.getElementsByTagName("addon-card");
-        #     for(let card of cards){
-        #         card.addon.disable();
-        #         card.addon.enable();
-        #     }
-        # """)
+            # self.driver.get("about:addons")
+            # self.driver.find_element_by_id("category-extension").click()
+            # self.driver.execute_script("""
+            #     let hb = document.getElementById("html-view-browser");
+            #     let al = hb.contentWindow.window.document.getElementsByTagName("addon-list")[0];
+            #     let cards = al.getElementsByTagName("addon-card");
+            #     for(let card of cards){
+            #         card.addon.disable();
+            #         card.addon.enable();
+            #     }
+            # """)
 
-        while len(self.driver.window_handles) > 1:
-            time.sleep(0.5)
-            self.driver.switch_to.window(self.driver.window_handles[-1])
-            self.driver.close()
-        
-        self.driver.switch_to.window(self.driver.window_handles[0])
-
-        if change_timezone_id is not None and manual_set_timezone:
-            if host is not None and port is not None:
-                self.open_new_tab('https://whatismyipaddress.com/')
-                time.sleep(0.25)
-
-            self.open_new_tab('https://www.google.com/search?client=firefox-b-d&q=my+timezone')
-            time.sleep(0.25)
-
-            self.driver.switch_to.window(self.driver.window_handles[0])
-            
-            input('\n\n\nSet timezone.\n\nPress ENTER, when finished. ')
-        
             while len(self.driver.window_handles) > 1:
                 time.sleep(0.5)
                 self.driver.switch_to.window(self.driver.window_handles[-1])
                 self.driver.close()
             
             self.driver.switch_to.window(self.driver.window_handles[0])
-        elif host is not None and port is not None:
-            self.driver.get('https://whatismyipaddress.com/')
+
+            if change_timezone_id is not None and manual_set_timezone:
+                if host is not None and port is not None:
+                    self.open_new_tab('https://whatismyipaddress.com/')
+                    time.sleep(0.25)
+
+                self.open_new_tab('https://www.google.com/search?client=firefox-b-d&q=my+timezone')
+                time.sleep(0.25)
+
+                self.driver.switch_to.window(self.driver.window_handles[0])
+                
+                input('\n\n\nSet timezone.\n\nPress ENTER, when finished. ')
+            
+                while len(self.driver.window_handles) > 1:
+                    time.sleep(0.5)
+                    self.driver.switch_to.window(self.driver.window_handles[-1])
+                    self.driver.close()
+                
+                self.driver.switch_to.window(self.driver.window_handles[0])
+            elif host is not None and port is not None:
+                self.driver.get('https://whatismyipaddress.com/')
+        except:
+            while len(self.driver.window_handles) > 1:
+                time.sleep(0.5)
+                self.driver.switch_to.window(self.driver.window_handles[-1])
+                self.driver.close()
     
     def get(
         self,
