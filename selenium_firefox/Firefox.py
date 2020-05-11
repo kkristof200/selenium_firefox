@@ -80,7 +80,7 @@ class Firefox:
 
         options = FirefoxOptions()
         if headless:
-            options.add_argument("--headless")
+            options.add_argument("--headless")source ~/.zshrc
 
         self.driver = webdriver.Firefox(firefox_profile=profile, firefox_options=options)
 
