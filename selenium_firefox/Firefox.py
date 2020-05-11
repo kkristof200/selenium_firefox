@@ -6,6 +6,7 @@ from selenium.webdriver.common import keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By as by
 from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.firefox.options import Options as FirefoxOptions
 
 from fake_useragent import UserAgent
 import tldextract
@@ -26,6 +27,7 @@ class Firefox:
         port: int = None,
         private: bool = False,
         full_screen: bool = True,
+        headless: bool = False,
         language: str = 'en-us',
         manual_set_timezone: bool = False,
         user_agent: str = None
@@ -76,7 +78,11 @@ class Firefox:
 
         profile.update_preferences()
 
-        self.driver = webdriver.Firefox(firefox_profile=profile)
+        options = FirefoxOptions()
+        if headless:
+            options.add_argument("--headless")
+
+        self.driver = webdriver.Firefox(firefox_profile=profile, firefox_options=options)
 
         if full_screen:
             self.driver.fullscreen_window()
