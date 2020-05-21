@@ -1,8 +1,8 @@
-from typing import Optional
+from typing import Optional, Dict
 
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.common import keys
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By as by
 from selenium.common.exceptions import NoSuchElementException
@@ -12,7 +12,7 @@ from fake_useragent import UserAgent
 import tldextract
 
 By = by
-Keys = keys
+Keys = Keys
 
 import pickle, os, time
 
@@ -30,7 +30,8 @@ class Firefox:
         headless: bool = False,
         language: str = 'en-us',
         manual_set_timezone: bool = False,
-        user_agent: str = None
+        user_agent: str = None,
+        load_proxy_checker_website: bool = False
     ):
         self.cookies_folder_path = cookies_folder_path
         profile = webdriver.FirefoxProfile()
@@ -96,7 +97,7 @@ class Firefox:
 
                         if 'change_timezone' in filename:
                             change_timezone_id = addon_id
-        
+
             # self.driver.get("about:addons")
             # self.driver.find_element_by_id("category-extension").click()
             # self.driver.execute_script("""
@@ -134,19 +135,30 @@ class Firefox:
                     self.driver.close()
                 
                 self.driver.switch_to.window(self.driver.window_handles[0])
-            elif host is not None and port is not None:
+            elif load_proxy_checker_website and host is not None and port is not None:
                 self.driver.get('https://whatismyipaddress.com/')
         except:
             while len(self.driver.window_handles) > 1:
                 time.sleep(0.5)
                 self.driver.switch_to.window(self.driver.window_handles[-1])
                 self.driver.close()
-    
+
     def get(
         self,
         url: str
-    ) -> None:
+    ) -> bool:
+        clean_current = self.driver.current_url.replace('https://', '').replace('www.', '').strip('/')
+        clean_new = url.replace('https://', '').replace('www.', '').strip('/')
+
+        if clean_current == clean_new:
+            return False
+        
         self.driver.get(url)
+
+        return True
+
+    def refresh(self) -> None:
+        self.driver.refresh()
 
     def find(
         self,
@@ -183,6 +195,23 @@ class Firefox:
             )
 
             return es
+        except:
+            return None
+    
+    def get_attribute(self, element, key: str) -> Optional[str]:
+        try:
+            return element.get_attribute(key)
+        except:
+            return None
+
+    def get_attributes(self, element) -> Optional[Dict[str, str]]:
+        try:
+            return json.loads(
+                self.browser.driver.execute_script(
+                    'var items = {}; for (index = 0; index < arguments[0].attributes.length; ++index) { items[arguments[0].attributes[index].name] = arguments[0].attributes[index].value }; return JSON.stringify(items);',
+                    element
+                )
+            )
         except:
             return None
 
