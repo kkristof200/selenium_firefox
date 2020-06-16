@@ -169,7 +169,10 @@ class Firefox:
     ) -> Optional:
         if element is None:
             element = self.driver
-        
+        elif by == By.XPATH and not key.startswith('.'):
+            # selenium has a bug with xpath. If xpath does not start with '.' it will search in the whole doc
+            key = '.' + key
+
         try:
             e = WebDriverWait(element, timeout).until(
                 EC.presence_of_element_located((by, key))
@@ -188,6 +191,9 @@ class Firefox:
     ) -> Optional:
         if element is None:
             element = self.driver
+        elif by == By.XPATH and not key.startswith('.'):
+            # selenium has a bug with xpath. If xpath does not start with '.' it will search in the whole doc
+            key = '.' + key
 
         try:
             es = WebDriverWait(element, timeout).until(
