@@ -1,4 +1,4 @@
-from typing import Optional, Dict
+from typing import Optional, Union, List, Dict, Callable
 
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
@@ -167,20 +167,29 @@ class Firefox:
         element: Optional = None,
         timeout: int = 15
     ) -> Optional:
-        if element is None:
-            element = self.driver
-        elif by == By.XPATH and not key.startswith('.'):
-            # selenium has a bug with xpath. If xpath does not start with '.' it will search in the whole doc
-            key = '.' + key
+        return self.__find(
+            by,
+            EC.presence_of_element_located,
+            key,
+            element=element,
+            timeout=timeout
+        )
 
-        try:
-            e = WebDriverWait(element, timeout).until(
-                EC.presence_of_element_located((by, key))
-            )
-
-            return e
-        except:        
-            return None
+    def find_by(
+        self,
+        type_: Optional[str] = None, #div, a, span, ...
+        id_: Optional[str] = None,
+        class_: Optional[str] = None,
+        attributes: Optional[Dict[str, str]] = None,
+        in_element: Optional = None,
+        timeout: int = 15
+    ) -> Optional:
+        return self.find(
+            By.XPATH,
+            self.__generate_xpath(type_=type_, id_=id_, class_=class_, attributes=attributes),
+            element=in_element,
+            timeout=timeout
+        )
 
     def find_all(
         self,
@@ -188,21 +197,30 @@ class Firefox:
         key: str,
         element: Optional = None,
         timeout: int = 15
+    ) -> List:
+        return self.__find(
+            by,
+            EC.presence_of_all_elements_located,
+            key,
+            element=element,
+            timeout=timeout
+        )
+
+    def find_all_by(
+        self,
+        type_: Optional[str] = None, #div, a, span, ...
+        id_: Optional[str] = None,
+        class_: Optional[str] = None,
+        attributes: Optional[Dict[str, str]] = None,
+        in_element: Optional = None,
+        timeout: int = 15
     ) -> Optional:
-        if element is None:
-            element = self.driver
-        elif by == By.XPATH and not key.startswith('.'):
-            # selenium has a bug with xpath. If xpath does not start with '.' it will search in the whole doc
-            key = '.' + key
-
-        try:
-            es = WebDriverWait(element, timeout).until(
-                EC.presence_of_all_elements_located((by, key))
-            )
-
-            return es
-        except:
-            return None
+        return self.find_all(
+            By.XPATH,
+            self.__generate_xpath(type_=type_, id_=id_, class_=class_, attributes=attributes),
+            element=in_element,
+            timeout=timeout
+        )
     
     def get_attribute(self, element, key: str) -> Optional[str]:
         try:
@@ -298,6 +316,55 @@ class Firefox:
 
 
     # PRIVATE
+    def __generate_xpath(
+        self,
+        type_: Optional[str] = None, #div, a, span, ...
+        id_: Optional[str] = None,
+        class_: Optional[str] = None,
+        attributes: Optional[Dict[str, str]] = None,
+    ) -> str:
+        attributes = attributes or {}
+
+        if class_ is not None:
+            attributes['class'] = class_
+
+        if id_ is not None:
+            attributes['id'] = id_
+
+        type_ = type_ or '*'
+        xpath_query = ''
+
+        for key, value in attributes.items():
+            if len(xpath_query) > 0:
+                xpath_query += ' and '
+
+            xpath_query += '@' + key + '=\'' + value + '\''
+
+        return '//' + type_ + '[' + xpath_query + ']'
+
+    def __find(
+        self,
+        by: By,
+        find_func: Callable,
+        key: str,
+        element: Optional = None,
+        timeout: int = 15
+    ) -> Union[Optional, List]:
+        if element is None:
+            element = self.driver
+        elif by == By.XPATH and not key.startswith('.'):
+            # selenium has a bug with xpath. If xpath does not start with '.' it will search in the whole doc
+            key = '.' + key
+
+        try:
+            es = WebDriverWait(element, timeout).until(
+                find_func((by, key))
+            )
+
+            return es
+        except:
+            return None
+
     def __random_firefox_user_agent(self, min_version: float = 60.0) -> str:
         while True:
             agent = UserAgent().firefox
