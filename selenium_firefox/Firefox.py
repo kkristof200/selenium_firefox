@@ -316,8 +316,8 @@ class Firefox:
 
 
     # PRIVATE
+    @staticmethod
     def __generate_xpath(
-        self,
         type_: Optional[str] = None, #div, a, span, ...
         id_: Optional[str] = None,
         class_: Optional[str] = None,
