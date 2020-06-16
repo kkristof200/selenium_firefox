@@ -186,10 +186,14 @@ class Firefox:
     ) -> Optional:
         return self.find(
             By.XPATH,
-            self.__generate_xpath(type_=type_, id_=id_, class_=class_, attributes=attributes),
+            self.generate_xpath(type_=type_, id_=id_, class_=class_, attributes=attributes),
             element=in_element,
             timeout=timeout
         )
+
+    # aliases
+    bsfind = find_by
+    find_ = find_by
 
     def find_all(
         self,
@@ -217,10 +221,14 @@ class Firefox:
     ) -> Optional:
         return self.find_all(
             By.XPATH,
-            self.__generate_xpath(type_=type_, id_=id_, class_=class_, attributes=attributes),
+            self.generate_xpath(type_=type_, id_=id_, class_=class_, attributes=attributes),
             element=in_element,
             timeout=timeout
         )
+
+    # aliases
+    bsfind_all = find_all_by
+    find_all_ = find_all_by
     
     def get_attribute(self, element, key: str) -> Optional[str]:
         try:
@@ -289,6 +297,33 @@ class Firefox:
         cmd = 'window.open("'+url+'","_blank");'
         self.driver.execute_script(cmd)
         self.driver.switch_to.window(self.driver.window_handles[-1])
+    
+    @staticmethod
+    def generate_xpath(
+        type_: Optional[str] = None, #div, a, span, ...
+        id_: Optional[str] = None,
+        class_: Optional[str] = None,
+        attributes: Optional[Dict[str, str]] = None,
+        for_sub_element: bool = False # selenium has a bug with xpath. If xpath does not start with '.' it will search in the whole doc
+    ) -> str:
+        attributes = attributes or {}
+
+        if class_ is not None:
+            attributes['class'] = class_
+
+        if id_ is not None:
+            attributes['id'] = id_
+
+        type_ = type_ or '*'
+        xpath_query = ''
+
+        for key, value in attributes.items():
+            if len(xpath_query) > 0:
+                xpath_query += ' and '
+
+            xpath_query += '@' + key + '=\'' + value + '\''
+
+        return ('.' if for_sub_element else '') + '//' + type_ + '[' + xpath_query + ']'
 
 
 
@@ -316,32 +351,6 @@ class Firefox:
 
 
     # PRIVATE
-    @staticmethod
-    def __generate_xpath(
-        type_: Optional[str] = None, #div, a, span, ...
-        id_: Optional[str] = None,
-        class_: Optional[str] = None,
-        attributes: Optional[Dict[str, str]] = None,
-    ) -> str:
-        attributes = attributes or {}
-
-        if class_ is not None:
-            attributes['class'] = class_
-
-        if id_ is not None:
-            attributes['id'] = id_
-
-        type_ = type_ or '*'
-        xpath_query = ''
-
-        for key, value in attributes.items():
-            if len(xpath_query) > 0:
-                xpath_query += ' and '
-
-            xpath_query += '@' + key + '=\'' + value + '\''
-
-        return '//' + type_ + '[' + xpath_query + ']'
-
     def __find(
         self,
         by: By,
@@ -349,7 +358,7 @@ class Firefox:
         key: str,
         element: Optional = None,
         timeout: int = 15
-    ) -> Union[Optional, List]:
+    ) -> Optional:
         if element is None:
             element = self.driver
         elif by == By.XPATH and not key.startswith('.'):
