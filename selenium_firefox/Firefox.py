@@ -235,7 +235,7 @@ class Firefox:
     bsfind_all = find_all_by
     find_all_ = find_all_by
 
-    def scroll_to(self, element) -> None:
+    def scroll_to_element(self, element) -> None:
         try:
             self.driver.execute_script("arguments[0].scrollIntoView();", element)
         except:
