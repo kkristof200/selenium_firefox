@@ -234,6 +234,12 @@ class Firefox:
     # aliases
     bsfind_all = find_all_by
     find_all_ = find_all_by
+
+    def scroll_to(self, element) -> None:
+        try:
+            self.driver.execute_script("arguments[0].scrollIntoView();", element)
+        except:
+            pass
     
     def get_attribute(self, element, key: str) -> Optional[str]:
         try:
