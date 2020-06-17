@@ -31,7 +31,8 @@ class Firefox:
         language: str = 'en-us',
         manual_set_timezone: bool = False,
         user_agent: str = None,
-        load_proxy_checker_website: bool = False
+        load_proxy_checker_website: bool = False,
+        disable_images: bool = False
     ):
         self.cookies_folder_path = cookies_folder_path
         profile = webdriver.FirefoxProfile()
@@ -56,6 +57,10 @@ class Firefox:
 
         if private:
             profile.set_preference("browser.privatebrowsing.autostart", True)
+        
+        if disable_images:
+            profile.set_preference('permissions.default.image', 2)
+            profile.set_preference('dom.ipc.plugins.enabled.libflashplayer.so', False)
         
         if host is not None and port is not None:
             profile.set_preference("network.proxy.type", 1)
