@@ -1,4 +1,4 @@
-from typing import Optional, Union, List, Dict, Callable
+from typing import Optional, Union, List, Dict, Callable, Tuple
 
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
@@ -234,12 +234,6 @@ class Firefox:
     # aliases
     bsfind_all = find_all_by
     find_all_ = find_all_by
-
-    def scroll_to_element(self, element) -> None:
-        try:
-            self.driver.execute_script("arguments[0].scrollIntoView();", element)
-        except:
-            pass
     
     def get_attribute(self, element, key: str) -> Optional[str]:
         try:
@@ -296,7 +290,38 @@ class Firefox:
             time.sleep(random.uniform(min_delay,max_delay))
 
     def scroll(self, amount: int) -> None:
-        self.driver.execute_script("window.scrollTo(0,"+str(self.current_page_offset_y()+amount)+");")
+        self.scroll_to(self.current_page_offset_y()+amount)
+    
+    def scroll_to(self, position: int) -> None:
+        try:
+            self.driver.execute_script("window.scrollTo(0,"+str(position)+");")
+        except:
+            pass
+
+    def scroll_to_element(self, element, header_element=None):
+        try:
+            header_h = 0
+
+            if header_element is not None:
+                _, _, _, header_h, _, _ = self.browser.get_element_coordinates(header)
+
+            _, element_y, _, _, _, _ = self.get_element_coordinates(element)
+
+            self.scroll_to(element_y-header_h)
+        except:
+            pass
+
+    # returns x, y, w, h, max_x, max_y
+    def get_element_coordinates(self, element) -> Tuple[int, int, int, int, int, int]:
+        location = element.location
+        size = element.size
+
+        x = location['x']
+        y = location['y']
+        w = size['width']
+        h = size['height']
+
+        return x, y, w, h, x+w, y+h
 
     def current_page_offset_y(self) -> float:
         return self.driver.execute_script("return window.pageYOffset;")
