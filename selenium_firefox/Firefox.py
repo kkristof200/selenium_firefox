@@ -21,8 +21,9 @@ RANDOM_USERAGENT = 'random'
 class Firefox:
     def __init__(
         self,
-        cookies_folder_path: str,
-        extensions_folder_path: str,
+        cookies_id: Optional[str] = None,
+        cookies_folder_path: Optional[str] = None,
+        extensions_folder_path: Optional[str] = None,
         host: str = None,
         port: int = None,
         private: bool = False,
@@ -34,7 +35,23 @@ class Firefox:
         load_proxy_checker_website: bool = False,
         disable_images: bool = False
     ):
+        '''EITHER PROVIDE 'cookies_id' OR  'cookies_folder_path'.
+           IF 'cookies_folder_path' is None, 'cokies_id', will be used to calculate 'cookies_folder_path'
+           IF 'cokies_id' is None, it will become 'test'
+        '''
+
+        if cookies_folder_path is None:
+            cookies_id = cookies_id or 'test'
+
+            current_folder_path = os.path.dirname(os.path.abspath(__file__))
+            general_cookies_folder_path = os.path.join(current_folder_path, 'cookies')
+            os.makedirs(general_cookies_folder_path, exist_ok=True)
+
+            cookies_folder_path = os.path.join(general_cookies_folder_path, cookies_id)
+
         self.cookies_folder_path = cookies_folder_path
+        os.makedirs(self.cookies_folder_path, exist_ok=True)
+
         profile = webdriver.FirefoxProfile()
 
         if user_agent is not None:
@@ -93,60 +110,62 @@ class Firefox:
         if full_screen:
             self.driver.fullscreen_window()
         
-        try:
-            change_timezone_id = None
-            for (dirpath, _, filenames) in os.walk(extensions_folder_path):
-                for filename in filenames:
-                    if filename.endswith('.xpi') or filename.endswith('.zip'):
-                        addon_id = self.driver.install_addon(os.path.join(dirpath, filename), temporary=False)
+        if extensions_folder_path is not None:
+            try:
+                change_timezone_id = None
 
-                        if 'change_timezone' in filename:
-                            change_timezone_id = addon_id
+                for (dirpath, _, filenames) in os.walk(extensions_folder_path):
+                    for filename in filenames:
+                        if filename.endswith('.xpi') or filename.endswith('.zip'):
+                            addon_id = self.driver.install_addon(os.path.join(dirpath, filename), temporary=False)
 
-            # self.driver.get("about:addons")
-            # self.driver.find_element_by_id("category-extension").click()
-            # self.driver.execute_script("""
-            #     let hb = document.getElementById("html-view-browser");
-            #     let al = hb.contentWindow.window.document.getElementsByTagName("addon-list")[0];
-            #     let cards = al.getElementsByTagName("addon-card");
-            #     for(let card of cards){
-            #         card.addon.disable();
-            #         card.addon.enable();
-            #     }
-            # """)
+                            if 'change_timezone' in filename:
+                                change_timezone_id = addon_id
 
-            while len(self.driver.window_handles) > 1:
-                time.sleep(0.5)
-                self.driver.switch_to.window(self.driver.window_handles[-1])
-                self.driver.close()
-            
-            self.driver.switch_to.window(self.driver.window_handles[0])
+                # self.driver.get("about:addons")
+                # self.driver.find_element_by_id("category-extension").click()
+                # self.driver.execute_script("""
+                #     let hb = document.getElementById("html-view-browser");
+                #     let al = hb.contentWindow.window.document.getElementsByTagName("addon-list")[0];
+                #     let cards = al.getElementsByTagName("addon-card");
+                #     for(let card of cards){
+                #         card.addon.disable();
+                #         card.addon.enable();
+                #     }
+                # """)
 
-            if change_timezone_id is not None and manual_set_timezone:
-                if host is not None and port is not None:
-                    self.open_new_tab('https://whatismyipaddress.com/')
-                    time.sleep(0.25)
-
-                self.open_new_tab('https://www.google.com/search?client=firefox-b-d&q=my+timezone')
-                time.sleep(0.25)
-
-                self.driver.switch_to.window(self.driver.window_handles[0])
-                
-                input('\n\n\nSet timezone.\n\nPress ENTER, when finished. ')
-            
                 while len(self.driver.window_handles) > 1:
                     time.sleep(0.5)
                     self.driver.switch_to.window(self.driver.window_handles[-1])
                     self.driver.close()
                 
                 self.driver.switch_to.window(self.driver.window_handles[0])
-            elif load_proxy_checker_website and host is not None and port is not None:
-                self.driver.get('https://whatismyipaddress.com/')
-        except:
-            while len(self.driver.window_handles) > 1:
-                time.sleep(0.5)
-                self.driver.switch_to.window(self.driver.window_handles[-1])
-                self.driver.close()
+
+                if change_timezone_id is not None and manual_set_timezone:
+                    if host is not None and port is not None:
+                        self.open_new_tab('https://whatismyipaddress.com/')
+                        time.sleep(0.25)
+
+                    self.open_new_tab('https://www.google.com/search?client=firefox-b-d&q=my+timezone')
+                    time.sleep(0.25)
+
+                    self.driver.switch_to.window(self.driver.window_handles[0])
+                    
+                    input('\n\n\nSet timezone.\n\nPress ENTER, when finished. ')
+                
+                    while len(self.driver.window_handles) > 1:
+                        time.sleep(0.5)
+                        self.driver.switch_to.window(self.driver.window_handles[-1])
+                        self.driver.close()
+                    
+                    self.driver.switch_to.window(self.driver.window_handles[0])
+                elif load_proxy_checker_website and host is not None and port is not None:
+                    self.driver.get('https://whatismyipaddress.com/')
+            except:
+                while len(self.driver.window_handles) > 1:
+                    time.sleep(0.5)
+                    self.driver.switch_to.window(self.driver.window_handles[-1])
+                    self.driver.close()
 
     def get(
         self,
