@@ -1,5 +1,10 @@
-from typing import Optional, Union, List, Dict, Callable, Tuple
+# --------------------------------------------------------------- Imports ---------------------------------------------------------------- #
 
+# System
+from typing import Optional, Union, List, Dict, Callable, Tuple
+import pickle, os, time
+
+# Pip
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.keys import Keys
@@ -14,24 +19,37 @@ import tldextract
 By = by
 Keys = Keys
 
-import pickle, os, time
+# ---------------------------------------------------------------------------------------------------------------------------------------- #
+
+
+
+# --------------------------------------------------------------- Defines ---------------------------------------------------------------- #
 
 RANDOM_USERAGENT = 'random'
 
+# ---------------------------------------------------------------------------------------------------------------------------------------- #
+
+
+
+# ------------------------------------------------------------ class: Firefox ------------------------------------------------------------ #
+
 class Firefox:
+
+    # ------------------------------------------------------------- Init ------------------------------------------------------------- #
+
     def __init__(
         self,
         cookies_id: Optional[str] = None,
         cookies_folder_path: Optional[str] = None,
         extensions_folder_path: Optional[str] = None,
-        host: str = None,
-        port: int = None,
+        host: Optional[str] = None,
+        port: Optional[int] = None,
         private: bool = False,
         full_screen: bool = True,
         headless: bool = False,
         language: str = 'en-us',
         manual_set_timezone: bool = False,
-        user_agent: str = None,
+        user_agent: Optional[str] = None,
         load_proxy_checker_website: bool = False,
         disable_images: bool = False
     ):
@@ -166,6 +184,47 @@ class Firefox:
                     time.sleep(0.5)
                     self.driver.switch_to.window(self.driver.window_handles[-1])
                     self.driver.close()
+
+
+    # -------------------------------------------------------- Public methods -------------------------------------------------------- #
+
+    def login_via_cookies(self, url: str, needed_cookie_name: Optional[str] = None) -> bool:
+        org_url = self.driver.current_url
+        self.get(url)
+        time.sleep(0.5)
+
+        try:
+            if self.has_cookies_for_current_website():
+                self.load_cookies()
+                time.sleep(1)
+                self.refresh()
+                time.sleep(1)
+            else:
+                self.get(org_url)
+
+                return False
+
+            for cookie in self.driver.get_cookies():
+                if needed_cookie_name is not None:
+                    if 'name' in cookie and cookie['name'] == needed_cookie_name:
+                        self.get(org_url)
+
+                        return True
+                else:
+                    for k, v in cookie.items():
+                        if k == 'expiry':
+                            if v - int(time.time()) < 0:
+                                self.get(org_url)
+
+                                return False
+        except:
+            self.get(org_url)
+
+            return False
+
+        self.get(org_url)
+
+        return needed_cookie_name is None
 
     def get(
         self,
@@ -381,7 +440,6 @@ class Firefox:
         return ('.' if for_sub_element else '') + '//' + type_ + '[' + xpath_query + ']'
 
 
-
     # LEGACY
     def scroll_to_bottom(self) -> None:
         MAX_TRIES = 25
@@ -404,8 +462,8 @@ class Firefox:
                 current_tries = 1
 
 
+    # ------------------------------------------------------- Private methods -------------------------------------------------------- #
 
-    # PRIVATE
     def __find(
         self,
         by: By,
@@ -450,3 +508,6 @@ class Firefox:
             self.cookies_folder_path,
             formatted_url + '.pkl'
         )
+
+
+# ---------------------------------------------------------------------------------------------------------------------------------------- #
