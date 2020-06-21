@@ -276,7 +276,7 @@ class Firefox:
     ) -> Optional:
         return self.find(
             By.XPATH,
-            self.generate_xpath(type_=type_, id_=id_, class_=class_, attributes=attributes),
+            self.generate_xpath(type_=type_, attributes=attributes, id_=id_, class_=class_),
             element=in_element,
             timeout=timeout
         )
@@ -311,7 +311,7 @@ class Firefox:
     ) -> Optional:
         return self.find_all(
             By.XPATH,
-            self.generate_xpath(type_=type_, id_=id_, class_=class_, attributes=attributes),
+            self.generate_xpath(type_=type_, attributes=attributes, id_=id_, class_=class_),
             element=in_element,
             timeout=timeout
         )
@@ -433,9 +433,9 @@ class Firefox:
     @staticmethod
     def generate_xpath(
         type_: Optional[str] = None, #div, a, span, ...
+        attributes: Optional[Dict[str, str]] = None,
         id_: Optional[str] = None,
         class_: Optional[str] = None,
-        attributes: Optional[Dict[str, str]] = None,
         for_sub_element: bool = False # selenium has a bug with xpath. If xpath does not start with '.' it will search in the whole doc
     ) -> str:
         attributes = attributes or {}
