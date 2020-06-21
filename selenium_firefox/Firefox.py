@@ -338,6 +338,13 @@ class Firefox:
             return None
 
     def save_cookies(self) -> None:
+        cookies_path = self.__cookies_path()
+
+        try:
+            os.remove(cookies_path)
+        except:
+            pass
+
         pickle.dump(
             self.driver.get_cookies(),
             open(self.__cookies_path(), "wb")
