@@ -226,6 +226,13 @@ class Firefox:
 
         return needed_cookie_name is None
 
+    def has_cookie(self, cookie_name: str) -> bool:
+        for cookie in self.driver.get_cookies():
+            if 'name' in cookie and cookie['name'] == cookie_name:
+                return True
+
+        return False
+
     def get(
         self,
         url: str
@@ -322,7 +329,7 @@ class Firefox:
     def get_attributes(self, element) -> Optional[Dict[str, str]]:
         try:
             return json.loads(
-                self.browser.driver.execute_script(
+                self.driver.execute_script(
                     'var items = {}; for (index = 0; index < arguments[0].attributes.length; ++index) { items[arguments[0].attributes[index].name] = arguments[0].attributes[index].value }; return JSON.stringify(items);',
                     element
                 )
@@ -381,7 +388,7 @@ class Firefox:
             header_h = 0
 
             if header_element is not None:
-                _, _, _, header_h, _, _ = self.browser.get_element_coordinates(header)
+                _, _, _, header_h, _, _ = self.get_element_coordinates(header)
 
             _, element_y, _, _, _, _ = self.get_element_coordinates(element)
 
