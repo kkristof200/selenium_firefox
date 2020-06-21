@@ -337,7 +337,7 @@ class Firefox:
         except:
             return None
 
-    def save_cookies(self) -> None:
+    def save_cookies(self, cookies: Optional[List[Dict]] = None) -> None:
         cookies_path = self.__cookies_path()
 
         try:
@@ -346,7 +346,7 @@ class Firefox:
             pass
 
         pickle.dump(
-            self.driver.get_cookies(),
+            cookies or self.driver.get_cookies(),
             open(self.__cookies_path(), "wb")
         )
 
@@ -357,13 +357,20 @@ class Firefox:
             return
 
         cookies = pickle.load(open(self.__cookies_path(), "rb"))
+        should_save = False
+        cookies_to_save = []
 
         for cookie in cookies:
             try:
                 self.driver.add_cookie(cookie)
+                cookies_to_save.append(cookie)
             except Exception as e:
+                should_save = True
                 print('Error while loading cookie:', e)
                 print(json.dumps(cookie, indent=4))
+        
+        if should_save:
+            self.save_cookies(cookies_to_save)
 
     def has_cookies_for_current_website(self, create_folder_if_not_exists: bool = True) -> bool:
         return os.path.exists(
