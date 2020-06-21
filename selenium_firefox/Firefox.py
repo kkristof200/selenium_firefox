@@ -39,11 +39,11 @@ class Firefox:
 
     def __init__(
         self,
-        cookies_id: Optional[str] = None,
         cookies_folder_path: Optional[str] = None,
         extensions_folder_path: Optional[str] = None,
         host: Optional[str] = None,
         port: Optional[int] = None,
+        cookies_id: Optional[str] = None,
         private: bool = False,
         full_screen: bool = True,
         headless: bool = False,
