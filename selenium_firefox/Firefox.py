@@ -268,9 +268,9 @@ class Firefox:
     def find_by(
         self,
         type_: Optional[str] = None, #div, a, span, ...
+        attributes: Optional[Dict[str, str]] = None,
         id_: Optional[str] = None,
         class_: Optional[str] = None,
-        attributes: Optional[Dict[str, str]] = None,
         in_element: Optional = None,
         timeout: int = 15
     ) -> Optional:
@@ -303,9 +303,9 @@ class Firefox:
     def find_all_by(
         self,
         type_: Optional[str] = None, #div, a, span, ...
+        attributes: Optional[Dict[str, str]] = None,
         id_: Optional[str] = None,
         class_: Optional[str] = None,
-        attributes: Optional[Dict[str, str]] = None,
         in_element: Optional = None,
         timeout: int = 15
     ) -> Optional:
