@@ -2,7 +2,7 @@
 
 # System
 from typing import Optional, Union, List, Dict, Callable, Tuple
-import pickle, os, time
+import pickle, os, time, json
 
 # Pip
 from selenium import webdriver
@@ -359,7 +359,11 @@ class Firefox:
         cookies = pickle.load(open(self.__cookies_path(), "rb"))
 
         for cookie in cookies:
-            self.driver.add_cookie(cookie)
+            try:
+                self.driver.add_cookie(cookie)
+            except Exception as e:
+                print('Error while loading cookie:', e)
+                print(json.dumps(cookie, indent=4))
 
     def has_cookies_for_current_website(self, create_folder_if_not_exists: bool = True) -> bool:
         return os.path.exists(
