@@ -217,7 +217,8 @@ class Firefox:
                                 self.get(org_url)
 
                                 return False
-        except:
+        except Exception as e:
+            print(e)
             self.get(org_url)
 
             return False
@@ -242,7 +243,7 @@ class Firefox:
 
         if clean_current == clean_new:
             return False
-        
+
         self.driver.get(url)
 
         return True
