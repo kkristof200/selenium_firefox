@@ -45,6 +45,7 @@ class Firefox:
         port: Optional[int] = None,
         cookies_id: Optional[str] = None,
         private: bool = False,
+        screen_size: Optional[Tuple[int, int]] = None, # (width, height)
         full_screen: bool = True,
         headless: bool = False,
         language: str = 'en-us',
@@ -116,12 +117,15 @@ class Firefox:
         profile.set_preference('useAutomationExtension', False)
 
         profile.set_preference("general.warnOnAboutConfig", False)
-
         profile.update_preferences()
-
         options = FirefoxOptions()
+
         if headless:
             options.add_argument("--headless")
+        
+        if screen_size is not None:
+            options.add_argument("--width=" + str(screen_size[0]))
+            options.add_argument("--height=" + str(screen_size[1]))
 
         self.driver = webdriver.Firefox(firefox_profile=profile, firefox_options=options)
 
