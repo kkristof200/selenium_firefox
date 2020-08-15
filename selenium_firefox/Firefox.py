@@ -281,7 +281,7 @@ class Firefox:
     ) -> Optional:
         return self.find(
             By.XPATH,
-            self.generate_xpath(type_=type_, attributes=attributes, id_=id_, class_=class_),
+            self.generate_xpath(type_=type_, attributes=attributes, id_=id_, class_=class_, for_sub_element=in_element),
             element=in_element,
             timeout=timeout
         )
@@ -316,7 +316,7 @@ class Firefox:
     ) -> Optional:
         return self.find_all(
             By.XPATH,
-            self.generate_xpath(type_=type_, attributes=attributes, id_=id_, class_=class_),
+            self.generate_xpath(type_=type_, attributes=attributes, id_=id_, class_=class_, for_sub_element=in_element),
             element=in_element,
             timeout=timeout
         )
@@ -467,7 +467,7 @@ class Firefox:
 
             xpath_query += '@' + key + '=\'' + value + '\''
 
-        return ('.' if for_sub_element else '') + '//' + type_ + ('[' + xpath_query + ']') if len(xpath_query) > 0 else ''
+        return ('.' if for_sub_element else '') + '//' + type_ + (('[' + xpath_query + ']') if len(xpath_query) > 0 else '')
 
 
     # LEGACY
