@@ -324,7 +324,7 @@ class Firefox:
     # aliases
     bsfind_all = find_all_by
     find_all_ = find_all_by
-    
+
     def get_attribute(self, element, key: str) -> Optional[str]:
         try:
             return element.get_attribute(key)
@@ -467,7 +467,7 @@ class Firefox:
 
             xpath_query += '@' + key + '=\'' + value + '\''
 
-        return ('.' if for_sub_element else '') + '//' + type_ + '[' + xpath_query + ']'
+        return ('.' if for_sub_element else '') + '//' + type_ + ('[' + xpath_query + ']') if len(xpath_query) > 0 else ''
 
 
     # LEGACY
