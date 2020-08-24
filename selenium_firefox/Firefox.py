@@ -5,6 +5,8 @@ from typing import Optional, Union, List, Dict, Callable, Tuple
 import pickle, os, time, json
 
 # Pip
+from webdriver_manager.firefox import GeckoDriverManager
+
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.keys import Keys
@@ -127,7 +129,7 @@ class Firefox:
             options.add_argument("--width=" + str(screen_size[0]))
             options.add_argument("--height=" + str(screen_size[1]))
 
-        self.driver = webdriver.Firefox(firefox_profile=profile, firefox_options=options)
+        self.driver = webdriver.Firefox(executable_path=GeckoDriverManager().install(), firefox_profile=profile, firefox_options=options)
 
         if full_screen:
             self.driver.fullscreen_window()
