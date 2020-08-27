@@ -54,7 +54,8 @@ class Firefox:
         manual_set_timezone: bool = False,
         user_agent: Optional[str] = None,
         load_proxy_checker_website: bool = False,
-        disable_images: bool = False
+        disable_images: bool = False,
+        geckodriver_path: Optional[str] = 'geckodriver'
     ):
         '''EITHER PROVIDE 'cookies_id' OR  'cookies_folder_path'.
            IF 'cookies_folder_path' is None, 'cokies_id', will be used to calculate 'cookies_folder_path'
@@ -129,7 +130,11 @@ class Firefox:
             options.add_argument("--width=" + str(screen_size[0]))
             options.add_argument("--height=" + str(screen_size[1]))
 
-        self.driver = webdriver.Firefox(executable_path=GeckoDriverManager().install(), firefox_profile=profile, firefox_options=options)
+        if not (geckodriver_path and os.path.exists(geckodriver_path)):
+            print('GeckoDriver not found at "', geckodriver_path, '". It will be installed')
+            geckodriver_path = GeckoDriverManager().install()
+
+        self.driver = webdriver.Firefox(executable_path=geckodriver_path, firefox_profile=profile, firefox_options=options)
 
         if full_screen:
             self.driver.fullscreen_window()
