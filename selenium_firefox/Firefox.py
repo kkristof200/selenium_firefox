@@ -13,6 +13,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By as by
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
+from selenium.webdriver.common.action_chains import ActionChains
 
 from fake_useragent import UserAgent
 import tldextract
@@ -291,13 +292,13 @@ class Firefox:
         attributes: Optional[Dict[str, str]] = None,
         id_: Optional[str] = None,
         class_: Optional[str] = None,
-        in_element: Optional = None,
+        in_element: Optional[WebElement] = None,
         timeout: Optional[int] = None,
         **kwargs
     ) -> Optional[WebElement]:
         return self.find(
             By.XPATH,
-            self.generate_xpath(type_=type_, attributes=attributes, id_=id_, class_=class_, for_sub_element=in_element, **kwargs),
+            self.generate_xpath(type_=type_, attributes=attributes, id_=id_, class_=class_, for_sub_element=in_element is not None, **kwargs),
             element=in_element,
             timeout=timeout
         )
@@ -338,13 +339,13 @@ class Firefox:
         attributes: Optional[Dict[str, str]] = None,
         id_: Optional[str] = None,
         class_: Optional[str] = None,
-        in_element: Optional = None,
+        in_element: Optional[WebElement] = None,
         timeout: Optional[int] = None,
         **kwargs
     ) -> List[WebElement]:
         return self.find_all(
             By.XPATH,
-            self.generate_xpath(type_=type_, attributes=attributes, id_=id_, class_=class_, for_sub_element=in_element, **kwargs),
+            self.generate_xpath(type_=type_, attributes=attributes, id_=id_, class_=class_, for_sub_element=in_element is not None, **kwargs),
             element=in_element,
             timeout=timeout
         )
@@ -446,6 +447,32 @@ class Firefox:
             self.scroll_to(element_y-header_h)
         except:
             pass
+    
+    def move_to_element(self, element: WebElement) -> bool:
+        try:
+            actions = ActionChains(self.driver)
+            actions.move_to_element(element).perform()
+
+            return True
+        except Exception as e:
+            print(e)
+
+            return False
+
+    def switch_to_frame(self, iframe: Optional[WebElement]) -> bool:
+        if not iframe:
+            print('None frame passed')
+
+            return False
+
+        try:
+            self.driver.switch_to.frame(iframe)
+
+            return True
+        except Exception as e:
+            print(e)
+
+            return False
 
     # returns x, y, w, h, max_x, max_y
     def get_element_coordinates(self, element) -> Tuple[int, int, int, int, int, int]:
