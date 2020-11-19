@@ -6,6 +6,7 @@ import pickle, os, time, json
 
 # Pip
 from selenium import webdriver
+from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
@@ -52,12 +53,15 @@ class Firefox:
         manual_set_timezone: bool = False,
         user_agent: Optional[str] = None,
         load_proxy_checker_website: bool = False,
-        disable_images: bool = False
+        disable_images: bool = False,
+        default_find_func_timeout: int = 2.5
     ):
         '''EITHER PROVIDE 'cookies_id' OR  'cookies_folder_path'.
            IF 'cookies_folder_path' is None, 'cokies_id', will be used to calculate 'cookies_folder_path'
            IF 'cokies_id' is None, it will become 'test'
         '''
+
+        self.default_find_func_timeout = default_find_func_timeout
 
         if cookies_folder_path is None:
             cookies_id = cookies_id or 'test'
@@ -70,6 +74,17 @@ class Firefox:
 
         self.cookies_folder_path = cookies_folder_path
         os.makedirs(self.cookies_folder_path, exist_ok=True)
+
+        user_agent_file_path = os.path.join(cookies_folder_path, 'ua.txt')
+
+        if user_agent:
+            if not os.path.exists(user_agent_file_path):
+                with open(user_agent_file_path, 'w') as f:
+                    f.write(user_agent)
+        else:
+            if os.path.exists(user_agent_file_path):
+                with open(user_agent_file_path, 'w') as f:
+                    user_agent = f.read()
 
         profile = webdriver.FirefoxProfile()
 
@@ -260,8 +275,8 @@ class Firefox:
         by: By,
         key: str,
         element: Optional = None,
-        timeout: int = 15
-    ) -> Optional:
+        timeout: Optional[int] = None
+    ) -> Union[Optional[WebElement], List[WebElement]]:
         return self.__find(
             by,
             EC.presence_of_element_located,
@@ -277,8 +292,8 @@ class Firefox:
         id_: Optional[str] = None,
         class_: Optional[str] = None,
         in_element: Optional = None,
-        timeout: int = 15
-    ) -> Optional:
+        timeout: Optional[int] = None
+    ) -> Optional[WebElement]:
         return self.find(
             By.XPATH,
             self.generate_xpath(type_=type_, attributes=attributes, id_=id_, class_=class_, for_sub_element=in_element),
@@ -290,13 +305,24 @@ class Firefox:
     bsfind = find_by
     find_ = find_by
 
+    def reload_element(
+        self,
+        element,
+        timeout: Optional[int] = None
+    ) -> Optional[WebElement]:
+        return self.find(
+            By.XPATH,
+            key=element.get_xpath(),
+            timeout=timeout
+        )
+
     def find_all(
         self,
         by: By,
         key: str,
         element: Optional = None,
-        timeout: int = 15
-    ) -> List:
+        timeout: Optional[int] = None
+    ) -> List[WebElement]:
         return self.__find(
             by,
             EC.presence_of_all_elements_located,
@@ -312,8 +338,8 @@ class Firefox:
         id_: Optional[str] = None,
         class_: Optional[str] = None,
         in_element: Optional = None,
-        timeout: int = 15
-    ) -> Optional:
+        timeout: Optional[int] = None
+    ) -> List[WebElement]:
         return self.find_all(
             By.XPATH,
             self.generate_xpath(type_=type_, attributes=attributes, id_=id_, class_=class_, for_sub_element=in_element),
@@ -509,8 +535,10 @@ class Firefox:
         find_func: Callable,
         key: str,
         element: Optional = None,
-        timeout: int = 15
-    ) -> Optional:
+        timeout: Optional[int] = None
+    ) -> Union[Optional[WebElement], List[WebElement]]:
+        timeout = timeout if timeout is not None else self.default_find_func_timeout
+
         if element is None:
             element = self.driver
         elif by == By.XPATH and not key.startswith('.'):
