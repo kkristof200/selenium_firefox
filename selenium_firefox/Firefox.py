@@ -486,9 +486,8 @@ class Firefox:
 
         if id_ is not None:
             attributes['id'] = id_
-        
-        attributes.update(kwargs)
 
+        attributes.update({k:(v if type(v) == str else json.dumps(v)) for k, v in kwargs.items()})
         type_ = type_ or '*'
         xpath_query = ''
 
