@@ -292,11 +292,12 @@ class Firefox:
         id_: Optional[str] = None,
         class_: Optional[str] = None,
         in_element: Optional = None,
-        timeout: Optional[int] = None
+        timeout: Optional[int] = None,
+        **kwargs
     ) -> Optional[WebElement]:
         return self.find(
             By.XPATH,
-            self.generate_xpath(type_=type_, attributes=attributes, id_=id_, class_=class_, for_sub_element=in_element),
+            self.generate_xpath(type_=type_, attributes=attributes, id_=id_, class_=class_, for_sub_element=in_element, **kwargs),
             element=in_element,
             timeout=timeout
         )
@@ -338,11 +339,12 @@ class Firefox:
         id_: Optional[str] = None,
         class_: Optional[str] = None,
         in_element: Optional = None,
-        timeout: Optional[int] = None
+        timeout: Optional[int] = None,
+        **kwargs
     ) -> List[WebElement]:
         return self.find_all(
             By.XPATH,
-            self.generate_xpath(type_=type_, attributes=attributes, id_=id_, class_=class_, for_sub_element=in_element),
+            self.generate_xpath(type_=type_, attributes=attributes, id_=id_, class_=class_, for_sub_element=in_element, **kwargs),
             element=in_element,
             timeout=timeout
         )
@@ -474,7 +476,8 @@ class Firefox:
         attributes: Optional[Dict[str, str]] = None,
         id_: Optional[str] = None,
         class_: Optional[str] = None,
-        for_sub_element: bool = False # selenium has a bug with xpath. If xpath does not start with '.' it will search in the whole doc
+        for_sub_element: bool = False, # selenium has a bug with xpath. If xpath does not start with '.' it will search in the whole doc
+        **kwargs
     ) -> str:
         attributes = attributes or {}
 
@@ -483,6 +486,8 @@ class Firefox:
 
         if id_ is not None:
             attributes['id'] = id_
+        
+        attributes.update(kwargs)
 
         type_ = type_ or '*'
         xpath_query = ''
