@@ -2,7 +2,7 @@
 
 # System
 from typing import Optional, Union, List, Dict, Callable, Tuple
-import pickle, os, time, json
+import pickle, os, time, json, inspect
 
 # Pip
 from selenium import webdriver
@@ -539,19 +539,10 @@ class Firefox:
 
     # JS
     def js_click(self, element: WebElement) -> bool:
-        if not element:
-            print('js_click: passed element is None')
+        return self.__js_execute_on_element('arguments[0].click();', element)
 
-            return False
-
-        try:
-            self.driver.execute_script('arguments[0].click();', element)
-
-            return True
-        except Exception as e:
-            print('js_click: passed element is None')
-
-            return False
+    def js_scroll_into_view(self, element: WebElement) -> bool:
+        return self.__js_execute_on_element('arguments[0].scrollIntoView();', element)
 
 
     # LEGACY
@@ -634,5 +625,21 @@ class Firefox:
             formatted_url + '.pkl'
         )
 
+    def __js_execute_on_element(self, script: str, element: WebElement) -> bool:
+        caller_name = inspect.stack()[2][3]
+    
+        if not element:
+            print('{}: passed element is None'.format(caller_name))
+
+            return False
+
+        try:
+            self.driver.execute_script(script, element)
+
+            return True
+        except Exception as e:
+            print('{}: {}'.format(caller_name, e))
+
+            return False
 
 # ---------------------------------------------------------------------------------------------------------------------------------------- #
