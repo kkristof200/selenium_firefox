@@ -102,46 +102,51 @@ class Firefox:
                     with open(user_agent_path, 'w') as file:
                         file.write(user_agent)
 
-            profile.set_preference("general.useragent.override", user_agent)
+            profile.set_preference('general.useragent.override', user_agent)
         
         if language is not None:
             profile.set_preference('intl.accept_languages', language)
 
         if private:
-            profile.set_preference("browser.privatebrowsing.autostart", True)
+            profile.set_preference('browser.privatebrowsing.autostart', True)
         
         if disable_images:
             profile.set_preference('permissions.default.image', 2)
             profile.set_preference('dom.ipc.plugins.enabled.libflashplayer.so', False)
         
         if host is not None and port is not None:
-            profile.set_preference("network.proxy.type", 1)
-            profile.set_preference("network.proxy.http", host)
-            profile.set_preference("network.proxy.http_port", port)
-            profile.set_preference("network.proxy.ssl", host)
-            profile.set_preference("network.proxy.ssl_port", port)
-            profile.set_preference("network.proxy.ftp", host)
-            profile.set_preference("network.proxy.ftp_port", port)
-            profile.set_preference("network.proxy.socks", host)
-            profile.set_preference("network.proxy.socks_port", port)
-            profile.set_preference("network.proxy.socks_version", 5)
-            profile.set_preference("signon.autologin.proxy", True)
+            profile.set_preference('network.proxy.type', 1)
+            profile.set_preference('network.proxy.http', host)
+            profile.set_preference('network.proxy.http_port', port)
+            profile.set_preference('network.proxy.ssl', host)
+            profile.set_preference('network.proxy.ssl_port', port)
+            profile.set_preference('network.proxy.ftp', host)
+            profile.set_preference('network.proxy.ftp_port', port)
+            profile.set_preference('network.proxy.socks', host)
+            profile.set_preference('network.proxy.socks_port', port)
+            profile.set_preference('network.proxy.socks_version', 5)
+            profile.set_preference('signon.autologin.proxy', True)
         
-        profile.set_preference("marionatte", False)
-        profile.set_preference("dom.webdriver.enabled", False)
-        profile.set_preference("media.peerconnection.enabled", False)
+        profile.set_preference('marionatte', False)
+        profile.set_preference('dom.webdriver.enabled', False)
+        profile.set_preference('media.peerconnection.enabled', False)
         profile.set_preference('useAutomationExtension', False)
 
-        profile.set_preference("general.warnOnAboutConfig", False)
+        profile.set_preference('general.warnOnAboutConfig', False)
         profile.update_preferences()
         options = FirefoxOptions()
 
-        if headless:
-            options.add_argument("--headless")
-        
         if screen_size is not None:
-            options.add_argument("--width=" + str(screen_size[0]))
-            options.add_argument("--height=" + str(screen_size[1]))
+            options.add_argument('--width={}'.format(screen_size[0]))
+            options.add_argument('--height={}'.format(screen_size[1]))
+            options.add_argument('--window-size={},{}'.format(screen_size[0], screen_size[1]))
+            options.add_argument('window-size={}x{}'.format(screen_size[0], screen_size[1]))
+
+        if full_screen:
+            options.add_argument('--start-maximized')
+
+        if headless:
+            options.add_argument('--headless')
 
         self.driver = webdriver.Firefox(firefox_profile=profile, firefox_options=options)
 
@@ -381,7 +386,7 @@ class Firefox:
 
         pickle.dump(
             cookies or self.driver.get_cookies(),
-            open(self.__cookies_path(), "wb")
+            open(self.__cookies_path(), 'wb')
         )
 
     def load_cookies(self) -> None:
@@ -390,7 +395,7 @@ class Firefox:
 
             return
 
-        cookies = pickle.load(open(self.__cookies_path(), "rb"))
+        cookies = pickle.load(open(self.__cookies_path(), 'rb'))
         should_save = False
         cookies_to_save = []
 
@@ -431,7 +436,7 @@ class Firefox:
     
     def scroll_to(self, position: int) -> None:
         try:
-            self.driver.execute_script("window.scrollTo(0,"+str(position)+");")
+            self.driver.execute_script('window.scrollTo(0,'+str(position)+');')
         except:
             pass
 
@@ -445,23 +450,28 @@ class Firefox:
             _, element_y, _, _, _, _ = self.get_element_coordinates(element)
 
             self.scroll_to(element_y-header_h)
-        except:
-            pass
+        except Exception as e:
+            print('scroll_to_element', e)
     
-    def move_to_element(self, element: WebElement) -> bool:
+    def move_to_element(self, element: Optional[WebElement]) -> bool:
+        if not element:
+            print('move_to_element: None element passed')
+
+            return False
+
         try:
             actions = ActionChains(self.driver)
             actions.move_to_element(element).perform()
 
             return True
         except Exception as e:
-            print(e)
+            print('move_to_element', e)
 
             return False
 
     def switch_to_frame(self, iframe: Optional[WebElement]) -> bool:
         if not iframe:
-            print('None frame passed')
+            print('switch_to_frame: None frame passed')
 
             return False
 
@@ -470,7 +480,7 @@ class Firefox:
 
             return True
         except Exception as e:
-            print(e)
+            print('switch_to_frame', e)
 
             return False
 
@@ -487,11 +497,11 @@ class Firefox:
         return x, y, w, h, x+w, y+h
 
     def current_page_offset_y(self) -> float:
-        return self.driver.execute_script("return window.pageYOffset;")
+        return self.driver.execute_script('return window.pageYOffset;')
 
     def open_new_tab(self, url: str) -> None:
         if url is None:
-            url = ""
+            url = ''
 
         cmd = 'window.open("'+url+'","_blank");'
         self.driver.execute_script(cmd)
@@ -525,6 +535,23 @@ class Firefox:
             xpath_query += '@' + key + '=\'' + value + '\''
 
         return ('.' if for_sub_element else '') + '//' + type_ + (('[' + xpath_query + ']') if len(xpath_query) > 0 else '')
+
+
+    # JS
+    def js_click(self, element: WebElement) -> bool:
+        if not element:
+            print('js_click: passed element is None')
+
+            return False
+
+        try:
+            self.driver.execute_script('arguments[0].click();', element)
+
+            return True
+        except Exception as e:
+            print('js_click: passed element is None')
+
+            return False
 
 
     # LEGACY
