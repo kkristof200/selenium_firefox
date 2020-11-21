@@ -139,11 +139,6 @@ class Firefox:
         if screen_size is not None:
             options.add_argument('--width={}'.format(screen_size[0]))
             options.add_argument('--height={}'.format(screen_size[1]))
-            options.add_argument('--window-size={},{}'.format(screen_size[0], screen_size[1]))
-            options.add_argument('window-size={}x{}'.format(screen_size[0], screen_size[1]))
-
-        if full_screen:
-            options.add_argument('--start-maximized')
 
         if headless:
             options.add_argument('--headless')
@@ -445,7 +440,7 @@ class Firefox:
             header_h = 0
 
             if header_element is not None:
-                _, _, _, header_h, _, _ = self.get_element_coordinates(header)
+                _, _, _, header_h, _, _ = self.get_element_coordinates(header_element)
 
             _, element_y, _, _, _, _ = self.get_element_coordinates(element)
 
