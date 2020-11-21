@@ -14,6 +14,7 @@ from selenium.webdriver.common.by import By as by
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 
 from fake_useragent import UserAgent
 import tldextract
@@ -46,6 +47,9 @@ class Firefox:
         host: Optional[str] = None,
         port: Optional[int] = None,
         cookies_id: Optional[str] = None,
+        firefox_binary_path: Optional[str] = None,
+        # proxy: Optional[str] = None,
+        profile_path: Optional[str] = None,
         private: bool = False,
         screen_size: Optional[Tuple[int, int]] = None, # (width, height)
         full_screen: bool = True,
@@ -87,7 +91,7 @@ class Firefox:
                 with open(user_agent_file_path, 'w') as f:
                     user_agent = f.read()
 
-        profile = webdriver.FirefoxProfile()
+        profile = webdriver.FirefoxProfile(profile_path if profile_path and os.path.exists(profile_path) else None)
 
         if user_agent is not None:
             if user_agent == RANDOM_USERAGENT:
@@ -143,11 +147,34 @@ class Firefox:
         if headless:
             options.add_argument('--headless')
 
-        self.driver = webdriver.Firefox(firefox_profile=profile, firefox_options=options)
+        # seleniumwire_options = {
+        #     'suppress_connection_errors': True
+        # }
+
+        # if proxy:
+        #     if type(proxy) == str:
+        #         proxy = proxy.strip().lstrip('https://').lstrip('http://').lstrip('ftp://')
+
+        #         seleniumwire_options['proxy'] = {
+        #             'https': 'https://{}'.format(proxy),
+        #             'http': 'http://{}'.format(proxy),
+        #             'ftp': 'ftp://{}'.format(proxy)
+        #         }
+        # else:
+        #     seleniumwire_options = None
+
+        ff_binary = FirefoxBinary(firefox_path=firefox_binary_path) if firefox_binary_path and os.path.exists(firefox_binary_path) else None
+
+        self.driver = webdriver.Firefox(
+            firefox_profile=profile,
+            firefox_options=options,
+            # seleniumwire_options=seleniumwire_options,
+            firefox_binary=ff_binary
+        )
 
         if full_screen:
             self.driver.fullscreen_window()
-        
+
         if extensions_folder_path is not None:
             try:
                 change_timezone_id = None
@@ -440,7 +467,7 @@ class Firefox:
             header_h = 0
 
             if header_element is not None:
-                _, _, _, header_h, _, _ = self.get_element_coordinates(header_element)
+                _, _, _, header_h, _, _ = self.get_element_coordinates(header)
 
             _, element_y, _, _, _, _ = self.get_element_coordinates(element)
 
