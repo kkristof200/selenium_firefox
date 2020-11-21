@@ -467,7 +467,7 @@ class Firefox:
             header_h = 0
 
             if header_element is not None:
-                _, _, _, header_h, _, _ = self.get_element_coordinates(header)
+                _, _, _, header_h, _, _ = self.get_element_coordinates(header_element)
 
             _, element_y, _, _, _, _ = self.get_element_coordinates(element)
 
