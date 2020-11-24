@@ -83,12 +83,14 @@ class Firefox:
         user_agent_file_path = os.path.join(cookies_folder_path, 'ua.txt')
 
         if user_agent:
+            user_agent = user_agent.strip()
+
             if not os.path.exists(user_agent_file_path):
                 with open(user_agent_file_path, 'w') as f:
                     f.write(user_agent)
         else:
             if os.path.exists(user_agent_file_path):
-                with open(user_agent_file_path, 'w') as f:
+                with open(user_agent_file_path, 'r') as f:
                     user_agent = f.read()
 
         profile = webdriver.FirefoxProfile(profile_path if profile_path and os.path.exists(profile_path) else None)
