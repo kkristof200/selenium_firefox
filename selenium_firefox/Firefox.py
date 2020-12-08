@@ -563,10 +563,30 @@ class Firefox:
 
     # JS
     def js_click(self, element: WebElement) -> bool:
-        return self.__js_execute_on_element('arguments[0].click();', element)
+        return self.execute_script_on_element('arguments[0].click();', element)
 
     def js_scroll_into_view(self, element: WebElement) -> bool:
-        return self.__js_execute_on_element('arguments[0].scrollIntoView();', element)
+        return self.execute_script_on_element('arguments[0].scrollIntoView();', element)
+
+    def execute_script_on_element(self, script: str, element: WebElement) -> bool:
+        caller_name = inspect.stack()[2][3]
+
+        if not element:
+            print('{}: passed element is None'.format(caller_name))
+
+            return False
+
+        return self.execute_js(script, element)
+
+    def execute_script(self, script: str, element: Optional[WebElement] = None) -> bool:
+        try:
+            self.driver.execute_script(script, element) if element else self.driver.execute_script(script)
+
+            return True
+        except Exception as e:
+            print('{}: {} - {}'.format(inspect.stack()[2][3], script, e))
+
+            return False
 
 
     # LEGACY
@@ -649,21 +669,5 @@ class Firefox:
             formatted_url + '.pkl'
         )
 
-    def __js_execute_on_element(self, script: str, element: WebElement) -> bool:
-        caller_name = inspect.stack()[2][3]
-    
-        if not element:
-            print('{}: passed element is None'.format(caller_name))
-
-            return False
-
-        try:
-            self.driver.execute_script(script, element)
-
-            return True
-        except Exception as e:
-            print('{}: {}'.format(caller_name, e))
-
-            return False
 
 # ---------------------------------------------------------------------------------------------------------------------------------------- #
