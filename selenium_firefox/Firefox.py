@@ -576,7 +576,7 @@ class Firefox:
 
             return False
 
-        return self.execute_js(script, element)
+        return self.execute_script(script, element)
 
     def execute_script(self, script: str, element: Optional[WebElement] = None) -> bool:
         try:
