@@ -596,6 +596,15 @@ class Firefox:
 
             return False
 
+    def quit(self) -> bool:
+        try:
+            self.driver.quit()
+
+            return True
+        except Exception as e:
+            print('Error - Firefox: quit() - ', e)
+
+            return False
 
     # LEGACY
     def scroll_to_bottom(self) -> None:
@@ -623,9 +632,9 @@ class Firefox:
 
     def __del__(self):
         try:
-            self.driver.quit()
-        except:
-            pass
+            self.quit()
+        except Exception as e:
+            print('Error - Firefox: __del__() - ', e)
 
 
     # ------------------------------------------------------- Private methods -------------------------------------------------------- #
