@@ -285,13 +285,21 @@ class Firefox:
 
     def get(
         self,
-        url: str
+        url: str,
+        force: bool = False
     ) -> bool:
-        clean_current = self.driver.current_url.replace('https://', '').replace('www.', '').strip('/')
-        clean_new = url.replace('https://', '').replace('www.', '').strip('/')
+        if not force:
+            to_remove = ['http://', 'https://', 'www.']
 
-        if clean_current == clean_new:
-            return False
+            clean_current = self.driver.current_url
+            clean_new = url
+
+            for _to_remove in to_remove:
+                clean_current = clean_current.replace(_to_remove, '')
+                clean_new = clean_new.replace(_to_remove, '')
+
+            if clean_current.strip('/') == clean_new.strip('/'):
+                return False
 
         self.driver.get(url)
 
