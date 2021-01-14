@@ -109,7 +109,9 @@ class Firefox:
                         file.write(user_agent)
 
             profile.set_preference('general.useragent.override', user_agent)
-        
+
+        self.user_agent = user_agent
+
         if language is not None:
             profile.set_preference('intl.accept_languages', language)
 
