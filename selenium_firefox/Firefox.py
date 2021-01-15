@@ -104,13 +104,15 @@ class Firefox:
                         user_agent = file.read().strip()
                 else:
                     user_agent = self.__random_firefox_user_agent(min_version=60.0)
-                    
+
                     with open(user_agent_path, 'w') as file:
                         file.write(user_agent)
 
             profile.set_preference('general.useragent.override', user_agent)
 
-        self.user_agent = user_agent
+        self.__user_agent = user_agent
+        self.__proxy_port = port
+        self.__proxy_host = host
 
         if language is not None:
             profile.set_preference('intl.accept_languages', language)
@@ -235,6 +237,30 @@ class Firefox:
                     time.sleep(0.5)
                     self.driver.switch_to.window(self.driver.window_handles[-1])
                     self.driver.close()
+
+
+    # ------------------------------------------------------ Public properties ------------------------------------------------------- #
+
+    @property
+    def user_agent(self) -> str:
+        self.__user_agent = self.__user_agent or self.js_get_user_agent()
+
+        return self.__user_agent
+
+
+    # proxy
+
+    @property
+    def proxy_host(self) -> Optional[str]:
+        return self.__proxy_host
+
+    @property
+    def proxy_port(self) -> Optional[int]:
+        return self.__proxy_port
+
+    @property
+    def proxy_str(self) -> Optional[str]:
+        return '{}:{}'.format(self.proxy_host, self.proxy_port) if self.proxy_host and self.proxy_port is not None else None
 
 
     # -------------------------------------------------------- Public methods -------------------------------------------------------- #
@@ -577,6 +603,9 @@ class Firefox:
 
     def js_scroll_into_view(self, element: WebElement) -> bool:
         return self.execute_script_on_element('arguments[0].scrollIntoView();', element)
+
+    def js_get_user_agent(self) -> str:
+        return self.execute_script("return navigator.userAgent;")
 
     def execute_script_on_element(self, script: str, element: WebElement) -> bool:
         caller_name = inspect.stack()[2][3]
