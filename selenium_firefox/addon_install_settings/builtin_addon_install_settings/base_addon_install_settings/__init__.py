@@ -1,0 +1,1 @@
+from .base_addon_install_settings import BaseAddonInstallSettings

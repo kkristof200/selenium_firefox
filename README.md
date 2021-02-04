@@ -13,4 +13,5 @@ pip3 install selenium-firefox
 ~~~~
 
 ## Dependencies
-geckodriver
+
+[geckodriver-autoinstaller](https://pypi.org/project/geckodriver-autoinstaller), [noraise](https://pypi.org/project/noraise), [selenium](https://pypi.org/project/selenium), [tldextract](https://pypi.org/project/tldextract)
