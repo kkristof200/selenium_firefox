@@ -102,7 +102,7 @@ class Firefox(
                 language=language,
                 private=private,
                 disable_images=disable_images,
-                proxy=self._proxy,
+                proxy=self._proxy if self._proxy and not self._proxy.needs_auth else None,
                 path=profile_path
             ),
             firefox_options=Utils.options(
