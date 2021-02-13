@@ -30,8 +30,8 @@ class AddonManager:
     ) -> List[BaseAddonInstallSettings]:
         for (dirpath, _, filenames) in os.walk(folder_path):
             return [
-                (os.path.join(dirpath, f), None, None, None)
-                for f in filenames if f.split('.')[-1] not in cls.__SUPPORTED_ADDON_FILE_EXTENSIONS
+                BaseAddonInstallSettings(os.path.join(dirpath, f))
+                for f in filenames if f.split('.')[-1] in cls.__SUPPORTED_ADDON_FILE_EXTENSIONS
             ]
 
     @classmethod
