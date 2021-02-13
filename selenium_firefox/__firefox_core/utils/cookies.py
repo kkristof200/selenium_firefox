@@ -36,7 +36,7 @@ class Cookies:
         if not saved_cookies_path:
             return None
 
-        cookies = pickle.load(open(saved_cookies_path, 'rb')) if saved_cookies_path.endswith('.pkl') else json.load(saved_cookies_path)
+        cookies = pickle.load(open(saved_cookies_path, 'rb')) if saved_cookies_path.endswith('.pkl') else json.load(open(saved_cookies_path, 'rb'))
 
         return [Cookie(cookie_dict) for cookie_dict in cookies]
 

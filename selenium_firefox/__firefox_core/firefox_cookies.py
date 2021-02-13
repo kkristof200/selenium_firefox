@@ -41,34 +41,28 @@ class FirefoxCookies:
         self.driver.get(url)
         time.sleep(0.5)
 
-        if isinstance(accepted_cookie_names, str):
-            accepted_cookie_names = [accepted_cookie_names]
+        @noraise(default_return_value=False)
+        def __login_via_cookies(accepted_cookie_names: Union[str, List[str]]):
+            if isinstance(accepted_cookie_names, str):
+                accepted_cookie_names = [accepted_cookie_names]
 
-        try:
             if self.has_cookies_for_current_website():
                 self.load_cookies()
                 time.sleep(1)
                 self.driver.refresh()
                 time.sleep(1)
             else:
-                self.driver.get(org_url)
-
                 return False
 
             for cookie in self.get_cookies():
                 if accepted_cookie_names and cookie.name in accepted_cookie_names and not cookie.is_session_cookie and not cookie.is_expired:
-                    self.driver.get(org_url)
-
                     return True
-        except Exception as e:
-            print(e)
-            self.driver.get(org_url)
 
-            return False
+        login_res = __login_via_cookies(accepted_cookie_names)
 
         self.driver.get(org_url)
 
-        return False
+        return login_res
 
     def save_cookies(
         self,
