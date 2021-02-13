@@ -105,18 +105,18 @@ class FirefoxCookies:
         did_add_cookie = False
 
         for cookie in cookies:
-            if cookie.is_session_cookie:
-                print('Cookie named \'{}\' for domain \'{}\' was a session only cookie so won\'t be used'.format(
-                    cookie.name,
-                    cookie.domain
-                ))
+            # if cookie.is_session_cookie:
+            #     print('Cookie named \'{}\' for domain \'{}\' was a session only cookie so won\'t be used'.format(
+            #         cookie.name,
+            #         cookie.domain
+            #     ))
 
-                continue
+            #     continue
 
-            if cookie.is_expired:
-                print('Cookie named \'{}\' for domain \'{}\' did expire'.format(cookie.name, cookie.domain))
+            # if cookie.is_expired:
+            #     print('Cookie named \'{}\' for domain \'{}\' did expire'.format(cookie.name, cookie.domain))
 
-                continue
+            #     continue
 
             if add_cookie(cookie):
                 did_add_cookie = True
