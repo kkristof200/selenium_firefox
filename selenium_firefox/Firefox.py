@@ -138,7 +138,8 @@ class Firefox(
 
     @noraise()
     def __del__(self):
-        self.quit()
+        if os.path.exists(self.driver.profile.path):
+            self.quit()
 
 
 # ---------------------------------------------------------------------------------------------------------------------------------------- #
