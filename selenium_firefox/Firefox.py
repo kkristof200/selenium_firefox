@@ -68,16 +68,22 @@ class Firefox(
         user_agent: Optional[str] = None,
         disable_images: bool = False,
 
+        # selenium-wire support
+        webdriver_class: Optional = None,
+
         # find function
         default_find_func_timeout: int = 2.5
     ):
         '''EITHER PROVIDE 'cookies_id' OR  'cookies_folder_path'.
            IF 'cookies_folder_path' is None, 'cokies_id', will be used to calculate 'cookies_folder_path'
            IF 'cokies_id' is None, it will become 'test'
+
+           webdriver_class: override class used to create webdriver (for example: seleniumwire.webdriver.Firefox), Defaults to: 'selenium.webdriver.Firefox'
         '''
 
         self.default_find_func_timeout = default_find_func_timeout
         self.pickle_cookies = pickle_cookies
+        self.source_profile_path = profile_path
 
         self.cookies_folder_path = Utils.cookies_folder_path(
             cookies_folder_path=cookies_folder_path,
@@ -96,7 +102,7 @@ class Firefox(
             port=port
         )
 
-        self.driver = FirefoxWebDriver(
+        self.driver = (webdriver_class or FirefoxWebDriver)(
             firefox_profile=Utils.profile(
                 user_agent=self._user_agent,
                 language=language,
@@ -132,6 +138,20 @@ class Firefox(
             ),
             temporary=False
         )
+
+
+    # -------------------------------------------------------- Public methods -------------------------------------------------------- #
+
+    @noraise(default_return_value=False)
+    def backup_profile(
+        self,
+        target_profile_path: Optional[str] = None
+    ) -> bool:
+        target_profile_path = target_profile_path or self.source_profile_path
+        os.makedirs(target_profile_path, exist_ok=True)
+        print(os.system('cp -r "{}" "{}"'.format(self.temp_profile_folder_path, target_profile_path)))
+
+        return True
 
 
     # --------------------------------------------------------- Destructor ----------------------------------------------------------- #

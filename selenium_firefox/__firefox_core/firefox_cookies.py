@@ -73,7 +73,7 @@ class FirefoxCookies:
         return Cookies.save(
             url=url or self.driver.current_url,
             folder_path=folder_path or self.cookies_folder_path,
-            cookies=cookies or self.driver.get_cookies(),
+            cookies=cookies or self._get_cookies(),
             pickled=self.pickle_cookies
         )
 
@@ -140,10 +140,10 @@ class FirefoxCookies:
         )
 
     def get_cookies(self) -> List[Cookie]:
-        return [Cookie(d) for d in self.driver.get_cookies()]
+        return [Cookie(d) for d in self._get_cookies()]
 
     def get_usable_cookies(self) -> List[Cookie]:
-        return [c for c in [Cookie(d) for d in self.driver.get_cookies()] if not c.is_expired]
+        return [c for c in [Cookie(d) for d in self._get_cookies()] if not c.is_expired]
 
     def has_all_cookies(self, cookie_names: Union[str, List[str]]) -> bool:
         existing_cookie_names = [c.name for c in self.get_usable_cookies()]
@@ -189,6 +189,13 @@ class FirefoxCookies:
 
     # alias - kept for convenience
     has_cookies_for_url = has_saved_cookies_for_url
+
+
+    # ------------------------------------------------------- Private methods -------------------------------------------------------- #
+
+    @noraise(default_return_value=[])
+    def _get_cookies(self) -> List[dict]:
+        return self.driver.get_cookies()
 
 
 # ---------------------------------------------------------------------------------------------------------------------------------------- #

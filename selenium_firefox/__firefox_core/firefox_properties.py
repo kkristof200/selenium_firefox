@@ -47,6 +47,14 @@ class FirefoxProperties:
 
         return _prefs()
 
+    @property
+    def temp_profile_folder_path(self) -> Optional[str]:
+        @noraise(print_exc=False)
+        def _temp_profile_folder_path() -> Optional[str]:
+            return self.capabilities.moz_profile
+
+        return _temp_profile_folder_path()
+
 
     # ------------------------------------------------------ Private properties ------------------------------------------------------ #
 
