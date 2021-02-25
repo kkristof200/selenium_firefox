@@ -91,13 +91,19 @@ class FirefoxWebelementFunctions(FirefoxJSFunctions):
 
 
     @noraise(default_return_value=False)
-    def move_to_element(self, element: Optional[WebElement]) -> bool:
+    def move_to_element(
+        self,
+        element: Optional[WebElement],
+        offset: Optional[Tuple[int, int]] = None
+    ) -> bool:
         if not element:
             print('move_to_element: None element passed')
 
             return False
 
-        ActionChains(self.driver).move_to_element(element).perform()
+        ac = ActionChains(self.driver)
+        ac.move_to_element_with_offset(element, offset[0], offset[1]) if offset else ac.move_to_element(element)
+        ac.perform()
 
         return True
 
