@@ -137,10 +137,10 @@ class Utils:
     def options(
         screen_size: Optional[Tuple[int, int]] = None, # (width, height)
         headless: bool = False,
+        mute_audio: bool = False,
         home_page_url: Optional[str] = None
     ) -> FirefoxOptions:
         options = FirefoxOptions()
-
         options.add_argument('--homepage \"{}\"'.format(home_page_url or 'data:,'))
 
         if screen_size is not None:
@@ -149,6 +149,9 @@ class Utils:
 
         if headless:
             options.add_argument('--headless')
+
+        if mute_audio:
+            options.add_argument('--mute-audio')
 
         return options
 

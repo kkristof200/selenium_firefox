@@ -69,6 +69,7 @@ class Firefox(
         # firefox option settings
         screen_size: Optional[Tuple[int, int]] = None, # (width, height)
         headless: bool = False,
+        mute_audio: bool = False,
         home_page_url: Optional[str] = None,
 
         # selenium-wire support
@@ -117,7 +118,8 @@ class Firefox(
             firefox_options=Utils.options(
                 screen_size=screen_size,
                 headless=headless,
-                home_page_url=home_page_url
+                home_page_url=home_page_url,
+                mute_audio=mute_audio
             ),
             firefox_binary=FirefoxBinary(
                 firefox_path=firefox_binary_path
