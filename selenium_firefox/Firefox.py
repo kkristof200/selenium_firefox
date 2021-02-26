@@ -61,12 +61,15 @@ class Firefox(
 
         # profile settings
         private: bool = False,
-        screen_size: Optional[Tuple[int, int]] = None, # (width, height)
         full_screen: bool = True,
-        headless: bool = False,
         language: str = 'en-us',
         user_agent: Optional[str] = None,
         disable_images: bool = False,
+
+        # firefox option settings
+        screen_size: Optional[Tuple[int, int]] = None, # (width, height)
+        headless: bool = False,
+        home_page_url: Optional[str] = None,
 
         # selenium-wire support
         webdriver_class: Optional = None,
@@ -113,7 +116,8 @@ class Firefox(
             ),
             firefox_options=Utils.options(
                 screen_size=screen_size,
-                headless=headless
+                headless=headless,
+                home_page_url=home_page_url
             ),
             firefox_binary=FirefoxBinary(
                 firefox_path=firefox_binary_path

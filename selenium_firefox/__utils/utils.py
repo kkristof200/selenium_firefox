@@ -136,9 +136,12 @@ class Utils:
     @staticmethod
     def options(
         screen_size: Optional[Tuple[int, int]] = None, # (width, height)
-        headless: bool = False
+        headless: bool = False,
+        home_page_url: Optional[str] = None
     ) -> FirefoxOptions:
         options = FirefoxOptions()
+
+        options.add_argument('--homepage \"{}\"'.format(home_page_url or 'data:,'))
 
         if screen_size is not None:
             options.add_argument('--width={}'.format(screen_size[0]))
