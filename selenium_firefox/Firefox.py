@@ -2,7 +2,7 @@
 
 # System
 from typing import Optional, Union, List, Tuple
-import os
+import os, shutil
 
 # Pip
 from noraise import noraise
@@ -154,10 +154,11 @@ class Firefox(
         target_profile_path: Optional[str] = None
     ) -> bool:
         target_profile_path = target_profile_path or self.source_profile_path
-        os.makedirs(target_profile_path, exist_ok=True)
-        print(os.system('cp -r "{}" "{}"'.format(self.temp_profile_folder_path, target_profile_path)))
 
-        return True
+        shutil.rmtree(target_profile_path)
+        shutil.copytree(self.temp_profile_folder_path, target_profile_path)
+
+        return os.path.exists(target_profile_path)
 
 
     # --------------------------------------------------------- Destructor ----------------------------------------------------------- #
