@@ -163,25 +163,17 @@ class Firefox(
 
         shutil.copytree(self.temp_profile_folder_path, target_profile_path)
 
-        if delete_cache:
-            cache_path = os.path.join(target_profile_path, 'cache2')
+        to_remove = [v for v in [
+            'cache2' if delete_cache else None,
+            'storage' if delete_storage else None,
+            'storage.sqlite' if delete_storage else None
+        ] if v]
 
-            if os.path.exists(cache_path):
-                shutil.rmtree(cache_path)
+        for v in to_remove:
+            p = os.path.join(target_profile_path, v)
 
-        if delete_storage:
-            storage_path = os.path.join(target_profile_path, 'storage')
-
-            if os.path.exists(storage_path):
-                shutil.rmtree(storage_path)
-
-            storage_path = os.path.join(target_profile_path, 'storage')
-
-            if os.path.exists(storage_path):
-                shutil.rmtree(storage_path)
-                
-                
-                storage.sqlite
+            if os.path.exists(p):
+                shutil.rmtree(p) if os.path.isdir(p) else os.remove(p)
 
         return os.path.exists(target_profile_path)
 
