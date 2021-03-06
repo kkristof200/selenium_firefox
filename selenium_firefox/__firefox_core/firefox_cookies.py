@@ -38,7 +38,7 @@ class FirefoxCookies:
         accepted_cookie_names: Union[str, List[str]]
     ) -> bool:
         org_url = self.driver.current_url
-        self.driver.get(url)
+        self.get(url)
         time.sleep(0.5)
 
         @noraise(default_return_value=False)
@@ -62,7 +62,7 @@ class FirefoxCookies:
 
         login_res = __login_via_cookies(accepted_cookie_names)
 
-        self.driver.get(org_url)
+        self.get(org_url)
 
         return login_res
 
