@@ -46,7 +46,7 @@ class Utils:
     @staticmethod
     def cookies_folder_path(
         cookies_folder_path: Optional[str] = None,
-        cookies_id: Optional[str] = None,
+        cookies_id: Optional[str] = None
     ) -> str:
         return cookies_folder_path or os.path.join(
             '/tmp' if platform.system() == 'Darwin' else tempfile.gettempdir(),

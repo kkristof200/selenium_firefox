@@ -46,13 +46,15 @@ class FirefoxCookies:
             if isinstance(accepted_cookie_names, str):
                 accepted_cookie_names = [accepted_cookie_names]
 
+            for cookie in self.get_cookies():
+                if accepted_cookie_names and cookie.name in accepted_cookie_names and not cookie.is_session_cookie and not cookie.is_expired:
+                    return True
+
             if self.has_cookies_for_current_website():
                 self.load_cookies()
                 time.sleep(1)
                 self.driver.refresh()
                 time.sleep(1)
-            else:
-                return False
 
             for cookie in self.get_cookies():
                 if accepted_cookie_names and cookie.name in accepted_cookie_names and not cookie.is_session_cookie and not cookie.is_expired:
