@@ -46,12 +46,13 @@ class Utils:
     @staticmethod
     def cookies_folder_path(
         cookies_folder_path: Optional[str] = None,
-        cookies_id: Optional[str] = None
+        cookies_id: Optional[str] = None,
+        profile_path: Optional[str] = None,
     ) -> str:
         return cookies_folder_path or os.path.join(
             '/tmp' if platform.system() == 'Darwin' else tempfile.gettempdir(),
             Constants.GENERAL_COOKIES_FOLDER_NAME,
-            cookies_id or Constants.DEFAULT_COOKIES_ID
+            cookies_id or profile_path.split(os.sep) if profile_path else Constants.DEFAULT_COOKIES_ID
         )
 
     @staticmethod

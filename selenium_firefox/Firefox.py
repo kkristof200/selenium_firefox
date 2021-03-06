@@ -80,7 +80,7 @@ class Firefox(
     ):
         '''EITHER PROVIDE 'cookies_id' OR  'cookies_folder_path'.
            IF 'cookies_folder_path' is None, 'cokies_id', will be used to calculate 'cookies_folder_path'
-           IF 'cokies_id' is None, it will become 'test'
+           IF 'cokies_id' is None, the name of the 'profile_path' follder wil lbe used. if that is Nonne too, 'test' will be used
 
            webdriver_class: override class used to create webdriver (for example: seleniumwire.webdriver.Firefox), Defaults to: 'selenium.webdriver.Firefox'
         '''
@@ -91,7 +91,8 @@ class Firefox(
 
         self.cookies_folder_path = Utils.cookies_folder_path(
             cookies_folder_path=cookies_folder_path,
-            cookies_id=cookies_id
+            cookies_id=cookies_id,
+            profile_path=profile_path
         )
         os.makedirs(self.cookies_folder_path, exist_ok=True)
 
@@ -173,6 +174,14 @@ class Firefox(
 
             if os.path.exists(storage_path):
                 shutil.rmtree(storage_path)
+
+            storage_path = os.path.join(target_profile_path, 'storage')
+
+            if os.path.exists(storage_path):
+                shutil.rmtree(storage_path)
+                
+                
+                storage.sqlite
 
         return os.path.exists(target_profile_path)
 
