@@ -155,10 +155,15 @@ class Firefox(
     ) -> bool:
         target_profile_path = target_profile_path or self.source_profile_path
 
-        if  os.path.exists(target_profile_path):
+        if os.path.exists(target_profile_path):
             shutil.rmtree(target_profile_path)
 
         shutil.copytree(self.temp_profile_folder_path, target_profile_path)
+
+        cache_path = os.path.join(target_profile_path, 'cache2')
+
+        if os.path.exists(cache_path):
+            shutil.rmtree(cache_path)
 
         return os.path.exists(target_profile_path)
 
