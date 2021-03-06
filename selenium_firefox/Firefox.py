@@ -151,7 +151,9 @@ class Firefox(
     @noraise(default_return_value=False)
     def backup_profile(
         self,
-        target_profile_path: Optional[str] = None
+        target_profile_path: Optional[str] = None,
+        delete_cache: bool = True,
+        delete_storage: bool = True,
     ) -> bool:
         target_profile_path = target_profile_path or self.source_profile_path
 
@@ -160,10 +162,17 @@ class Firefox(
 
         shutil.copytree(self.temp_profile_folder_path, target_profile_path)
 
-        cache_path = os.path.join(target_profile_path, 'cache2')
+        if delete_cache:
+            cache_path = os.path.join(target_profile_path, 'cache2')
 
-        if os.path.exists(cache_path):
-            shutil.rmtree(cache_path)
+            if os.path.exists(cache_path):
+                shutil.rmtree(cache_path)
+
+        if delete_storage:
+            storage_path = os.path.join(target_profile_path, 'storage')
+
+            if os.path.exists(storage_path):
+                shutil.rmtree(storage_path)
 
         return os.path.exists(target_profile_path)
 
