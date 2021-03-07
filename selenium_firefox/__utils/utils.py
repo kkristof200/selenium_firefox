@@ -52,7 +52,7 @@ class Utils:
         return cookies_folder_path or os.path.join(
             '/tmp' if platform.system() == 'Darwin' else tempfile.gettempdir(),
             Constants.GENERAL_COOKIES_FOLDER_NAME,
-            cookies_id or profile_path.split(os.sep) if profile_path else Constants.DEFAULT_COOKIES_ID
+            cookies_id if cookies_id else profile_path.strip(os.sep).split(os.sep)[-1] if profile_path else Constants.DEFAULT_COOKIES_ID
         )
 
     @staticmethod
