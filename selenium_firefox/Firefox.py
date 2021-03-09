@@ -164,8 +164,12 @@ class Firefox(
 
         current_copy_try = 0
 
-        while not os.path.exists(target_profile_path) or current_copy_try < max_copy_tries:
-            shutil.copytree(self.temp_profile_folder_path, target_profile_path)
+        while not os.path.exists(target_profile_path) and current_copy_try < max_copy_tries:
+            try:
+                shutil.copytree(self.temp_profile_folder_path, target_profile_path)
+            except:
+                pass
+
             time.sleep(0.1)
 
         to_remove = [v for v in [
