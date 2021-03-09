@@ -1,4 +1,4 @@
 geckodriver-autoinstaller==0.1.0
-noraise==0.0.9
+noraise==0.0.10
 selenium==3.141.0
 tldextract==3.1.0

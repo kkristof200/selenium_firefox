@@ -2,7 +2,7 @@
 
 # System
 from typing import Optional, Union, List, Tuple
-import os, shutil
+import os, shutil, time
 
 # Pip
 from noraise import noraise
@@ -155,13 +155,18 @@ class Firefox(
         target_profile_path: Optional[str] = None,
         delete_cache: bool = True,
         delete_storage: bool = True,
+        max_copy_tries: int = 5
     ) -> bool:
         target_profile_path = target_profile_path or self.source_profile_path
 
         if os.path.exists(target_profile_path):
             shutil.rmtree(target_profile_path)
 
-        shutil.copytree(self.temp_profile_folder_path, target_profile_path)
+        current_copy_try = 0
+
+        while not os.path.exists(target_profile_path) or current_copy_try < max_copy_tries:
+            shutil.copytree(self.temp_profile_folder_path, target_profile_path)
+            time.sleep(0.1)
 
         to_remove = [v for v in [
             'cache2' if delete_cache else None,
