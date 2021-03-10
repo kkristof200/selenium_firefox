@@ -86,8 +86,6 @@ class FirefoxFindFuncs:
         self,
         type_: Optional[str] = None, #div, a, span, ...
         attributes: Optional[Dict[str, str]] = None,
-        id_: Optional[str] = None,
-        class_: Optional[str] = None,
         in_element: Optional[WebElement] = None,
         timeout: Optional[int] = None,
         conditions: Optional[List[XPathCondition]] = None,
