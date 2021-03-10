@@ -57,7 +57,7 @@ class FirefoxFindFuncs:
     ) -> Optional[WebElement]:
         return self.find(
             By.XPATH,
-            XPathUtils.generate_xpath(type_=type_, attributes=attributes, conditions=conditions, condition_relation=condition_relation, for_sub_element=in_element is not None, **kwargs),
+            XPathUtils.generate_xpath(tag=type_, attributes=attributes, conditions=conditions, condition_relation=condition_relation, for_sub_element=in_element is not None, **kwargs),
             element=in_element,
             timeout=timeout
         )
@@ -96,7 +96,7 @@ class FirefoxFindFuncs:
     ) -> List[WebElement]:
         return self.find_all(
             By.XPATH,
-            XPathUtils.generate_xpath(type_=type_, attributes=attributes, conditions=conditions, condition_relation=condition_relation, for_sub_element=in_element is not None, **kwargs),
+            XPathUtils.generate_xpath(tag=type_, attributes=attributes, conditions=conditions, condition_relation=condition_relation, for_sub_element=in_element is not None, **kwargs),
             element=in_element,
             timeout=timeout
         )
