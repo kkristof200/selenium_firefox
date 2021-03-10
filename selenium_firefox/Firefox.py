@@ -189,7 +189,7 @@ class Firefox(
 
     # --------------------------------------------------------- Destructor ----------------------------------------------------------- #
 
-    @noraise()
+    @noraise(print_exc=False)
     def __del__(self):
         if os.path.exists(self.driver.profile.path):
             self.quit()
