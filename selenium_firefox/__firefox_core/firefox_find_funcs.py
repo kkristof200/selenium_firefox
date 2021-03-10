@@ -11,6 +11,9 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 
+# Local
+from ..xpath_utils import XPathUtils, XPathCondition, XPathConditionRelation
+
 # ---------------------------------------------------------------------------------------------------------------------------------------- #
 
 
@@ -46,15 +49,15 @@ class FirefoxFindFuncs:
         self,
         type_: Optional[str] = None, #div, a, span, ...
         attributes: Optional[Dict[str, str]] = None,
-        id_: Optional[str] = None,
-        class_: Optional[str] = None,
         in_element: Optional[WebElement] = None,
         timeout: Optional[int] = None,
+        conditions: Optional[List[XPathCondition]] = None,
+        condition_relation: Optional[XPathConditionRelation] = None,
         **kwargs
     ) -> Optional[WebElement]:
         return self.find(
             By.XPATH,
-            self.generate_xpath(type_=type_, attributes=attributes, id_=id_, class_=class_, for_sub_element=in_element is not None, **kwargs),
+            XPathUtils.generate_xpath(type_=type_, attributes=attributes, conditions=conditions, condition_relation=condition_relation, for_sub_element=in_element is not None, **kwargs),
             element=in_element,
             timeout=timeout
         )
@@ -87,11 +90,13 @@ class FirefoxFindFuncs:
         class_: Optional[str] = None,
         in_element: Optional[WebElement] = None,
         timeout: Optional[int] = None,
+        conditions: Optional[List[XPathCondition]] = None,
+        condition_relation: Optional[XPathConditionRelation] = None,
         **kwargs
     ) -> List[WebElement]:
         return self.find_all(
             By.XPATH,
-            self.generate_xpath(type_=type_, attributes=attributes, id_=id_, class_=class_, for_sub_element=in_element is not None, **kwargs),
+            XPathUtils.generate_xpath(type_=type_, attributes=attributes, conditions=conditions, condition_relation=condition_relation, for_sub_element=in_element is not None, **kwargs),
             element=in_element,
             timeout=timeout
         )
@@ -111,35 +116,6 @@ class FirefoxFindFuncs:
             key=element.get_xpath(),
             timeout=timeout
         )
-
-    @staticmethod
-    def generate_xpath(
-        type_: Optional[str] = None, #div, a, span, ...
-        attributes: Optional[Dict[str, str]] = None,
-        id_: Optional[str] = None,
-        class_: Optional[str] = None,
-        for_sub_element: bool = False, # selenium has a bug with xpath. If xpath does not start with '.' it will search in the whole doc
-        **kwargs
-    ) -> str:
-        attributes = attributes or {}
-
-        if class_ is not None:
-            attributes['class'] = class_
-
-        if id_ is not None:
-            attributes['id'] = id_
-
-        attributes.update({k:(v if type(v) == str else json.dumps(v)) for k, v in kwargs.items()})
-        type_ = type_ or '*'
-        xpath_query = ''
-
-        for key, value in attributes.items():
-            if len(xpath_query) > 0:
-                xpath_query += ' and '
-
-            xpath_query += '@' + key + '=\'' + value + '\''
-
-        return ('.' if for_sub_element else '') + '//' + type_ + (('[' + xpath_query + ']') if len(xpath_query) > 0 else '')
 
 
     # ------------------------------------------------------- Private methods -------------------------------------------------------- #
