@@ -94,6 +94,7 @@ class Utils:
         language: str = 'en-us',
         private: bool = False,
         disable_images: bool = False,
+        mute_audio: bool = False,
         proxy: Optional[Proxy] = None,
         path: Optional[str] = None
     ) -> FirefoxProfile:
@@ -111,6 +112,9 @@ class Utils:
         if disable_images:
             profile.set_preference('permissions.default.image', 2)
             profile.set_preference('dom.ipc.plugins.enabled.libflashplayer.so', False)
+
+        if mute_audio:
+            profile.set_preference('media.volume_scale','0.0');
 
         if proxy:
             profile.set_preference('network.proxy.type', 1)
@@ -138,7 +142,6 @@ class Utils:
     def options(
         screen_size: Optional[Tuple[int, int]] = None, # (width, height)
         headless: bool = False,
-        mute_audio: bool = False,
         home_page_url: Optional[str] = None
     ) -> FirefoxOptions:
         options = FirefoxOptions()
@@ -150,9 +153,6 @@ class Utils:
 
         if headless:
             options.add_argument('--headless')
-
-        if mute_audio:
-            options.add_argument('--mute-audio')
 
         return options
 

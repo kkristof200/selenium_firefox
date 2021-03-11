@@ -65,11 +65,11 @@ class Firefox(
         language: str = 'en-us',
         user_agent: Optional[str] = None,
         disable_images: bool = False,
+        mute_audio: bool = False,
 
         # firefox option settings
         screen_size: Optional[Tuple[int, int]] = None, # (width, height)
         headless: bool = False,
-        mute_audio: bool = False,
         home_page_url: Optional[str] = None,
 
         # selenium-wire support
@@ -113,13 +113,13 @@ class Firefox(
                 language=language,
                 private=private,
                 disable_images=disable_images,
+                mute_audio=mute_audio,
                 proxy=self._proxy if self._proxy and not self._proxy.needs_auth else None,
                 path=profile_path
             ),
             firefox_options=Utils.options(
                 screen_size=screen_size,
                 headless=headless,
-                mute_audio=mute_audio,
                 home_page_url=home_page_url
             ),
             firefox_binary=FirefoxBinary(
