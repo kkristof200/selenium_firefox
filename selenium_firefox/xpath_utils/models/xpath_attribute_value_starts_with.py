@@ -1,33 +1,26 @@
 # --------------------------------------------------------------- Imports ---------------------------------------------------------------- #
 
-# System
-from typing import Optional
-
 # Local
-from .xpath_condition import XPathCondition
+from .xpath_attribute_value import XpathAttributeValue
 from .enums import XPathConditionType
 
 # ---------------------------------------------------------------------------------------------------------------------------------------- #
 
 
 
-# ------------------------------------------------------ class: XPathEqualCondition ------------------------------------------------------ #
+# ------------------------------------------------- class: XpathAttributeValueStartsWith ------------------------------------------------- #
 
-class XPathEqualCondition(XPathCondition):
+class XpathAttributeValueStartsWith(XpathAttributeValue):
 
     # ------------------------------------------------------------- Init ------------------------------------------------------------- #
 
     def __init__(
         self,
-        name: str = None,
-        value = None,
-        **kwargs
+        value: any
     ):
         super().__init__(
-            name=name,
-            value=value,
-            condition_type=XPathConditionType.EQUALS,
-            **kwargs
+            value,
+            XPathConditionType.STARTS_WITH
         )
 
 

@@ -4,7 +4,7 @@
 from typing import Optional, List, Dict
 
 # Local
-from .models import XPathCondition, XPathContainsCondition, XPathEqualCondition, XPathConditionRelation
+from .models import XPathCondition, XPathConditionEquals, XPathConditionRelation, XpathAttributeValue
 
 # ---------------------------------------------------------------------------------------------------------------------------------------- #
 
@@ -53,7 +53,8 @@ class XPathUtils:
         attributes.update(kwargs)
 
         if attributes:
-            conditions.extend([XPathEqualCondition(**{k:v}) for k, v in attributes.items()])
+            for k, v in attributes.items():
+                conditions.push(v.condition(k) if isinstance(v, XpathAttributeValue) else XPathConditionEquals(**{k:v}))
 
         return '{}//{}{}'.format(
             '.' if for_sub_element else '',

@@ -1,6 +1,11 @@
 from .xpath_condition import XPathCondition
-from .xpath_equal_condition import XPathEqualCondition
-from .xpath_contains_condition import XPathContainsCondition
-from .xpath_starts_with_condition import XPathStartsWithCondition
+from .xpath_condition_equals import XPathConditionEquals
+from .xpath_condition_contains import XPathConditionContains
+from .xpath_condition_starts_with import XPathConditionStartsWith
+
+from .xpath_attribute_value import XpathAttributeValue
+from .xpath_attribute_value_equals import XpathAttributeValueEquals
+from .xpath_attribute_value_contains import XpathAttributeValueContains
+from .xpath_attribute_value_starts_with import XpathAttributeValueStartsWith
 
 from .enums import *

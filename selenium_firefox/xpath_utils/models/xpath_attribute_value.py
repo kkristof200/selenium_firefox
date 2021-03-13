@@ -1,8 +1,5 @@
 # --------------------------------------------------------------- Imports ---------------------------------------------------------------- #
 
-# System
-from typing import Optional
-
 # Local
 from .xpath_condition import XPathCondition
 from .enums import XPathConditionType
@@ -11,23 +8,31 @@ from .enums import XPathConditionType
 
 
 
-# ---------------------------------------------------- class: XPathStartsWithCondition --------------------------------------------------- #
+# ------------------------------------------------------ class: XpathAttributeValue ------------------------------------------------------ #
 
-class XPathStartsWithCondition(XPathCondition):
+class XpathAttributeValue:
 
     # ------------------------------------------------------------- Init ------------------------------------------------------------- #
 
     def __init__(
         self,
-        name: str = None,
-        value = None,
-        **kwargs
+        value: any,
+        condition_type: XPathConditionType
     ):
-        super().__init__(
-            name=name,
-            value=value,
-            condition_type=XPathConditionType.STARTS_WITH,
-            **kwargs
+        self.value = value
+        self.condition_type = condition_type
+
+
+    # -------------------------------------------------------- Public methods -------------------------------------------------------- #
+
+    def condition(
+        self,
+        attr_name: str
+    ) -> XPathCondition:
+        return XPathCondition(
+            name=attr_name,
+            value=self.value,
+            condition_type=self.condition_type
         )
 
 
