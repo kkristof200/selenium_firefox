@@ -53,7 +53,7 @@ class XPathUtils:
         attributes.update(kwargs)
 
         if attributes:
-            conditions.extend([(XPathContainsCondition if k in ['class', 'class_', '_class'] else XPathEqualCondition)(**{k:v}) for k, v in attributes.items()])
+            conditions.extend([XPathEqualCondition(**{k:v}) for k, v in attributes.items()])
 
         return '{}//{}{}'.format(
             '.' if for_sub_element else '',
