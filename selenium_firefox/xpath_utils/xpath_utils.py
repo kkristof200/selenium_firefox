@@ -54,7 +54,7 @@ class XPathUtils:
 
         if attributes:
             for k, v in attributes.items():
-                conditions.append(v.condition(k) if isinstance(v, XpathAttributeValue) else XPathConditionEquals(**{k:v}))
+                conditions.append(v.condition(k) if isinstance(v, XpathAttributeValue) else XPathConditionEquals(k, v))
 
         return '{}//{}{}'.format(
             '.' if for_sub_element else '',

@@ -1,1 +1,0 @@
-from .builtin_addon_install_settings import BuiltinAddonInstallSettings
