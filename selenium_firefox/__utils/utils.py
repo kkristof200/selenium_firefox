@@ -114,7 +114,7 @@ class Utils:
             profile.set_preference('dom.ipc.plugins.enabled.libflashplayer.so', False)
 
         if mute_audio:
-            profile.set_preference('media.volume_scale','0.0');
+            profile.set_preference('media.volume_scale','0.0')
 
         if proxy:
             profile.set_preference('network.proxy.type', 1)
