@@ -1,5 +1,10 @@
 # selenium_firefox
-![python_version](https://img.shields.io/static/v1?label=Python&message=3.5%20|%203.6%20|%203.7&color=blue) [![PyPI download month](https://img.shields.io/pypi/dm/selenium-firefox?logo=pypi&logoColor=white)](https://pypi.python.org/pypi/selenium-firefox/) [![PyPI version](https://img.shields.io/pypi/v/selenium-firefox?logo=pypi&logoColor=white)](https://pypi.python.org/pypi/selenium-firefox/)
+
+
+
+## Description
+
+User-friendly implementation of a firefox based selenium client
 
 ## Features
 - Easily create a firefox selenium webdriver with proxy(host/port), extensions and other settings, such as, full-screen-window,
@@ -8,8 +13,23 @@ private session.
 - Easily save and load cookies for websites
 
 ## Install
+
+~~~~bash
+pip install selenium_firefox
+# or
+pip3 install selenium_firefox
 ~~~~
-pip3 install selenium-firefox
+
+## Usage
+
+~~~~python
+from selenium_firefox import Firefox
+
+ff = Firefox()
+ff.get('https://www.google.com')
+
+import time
+time.sleep(999)
 ~~~~
 
 ## Dependencies
