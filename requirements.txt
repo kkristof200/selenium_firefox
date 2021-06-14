@@ -2,4 +2,4 @@ geckodriver-autoinstaller==0.1.0
 kproxy==0.0.1
 noraise==0.0.16
 selenium==3.141.0
-selenium-browser==0.0.10
+selenium-browser==0.0.11

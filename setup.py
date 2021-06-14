@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="selenium_firefox",
-    version="2.0.3",
+    version="2.0.4",
     author="Kovács Kristóf-Attila",
     description="selenium_firefox",
     long_description=long_description,
@@ -17,7 +17,7 @@ setuptools.setup(
         'kproxy>=0.0.1',
         'noraise>=0.0.16',
         'selenium>=3.141.0',
-        'selenium-browser>=0.0.10'
+        'selenium-browser>=0.0.11'
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
