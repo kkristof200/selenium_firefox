@@ -1,2 +1,0 @@
-from .xpath_condition_relation import XPathConditionRelation
-from .xpath_condition_type import XPathConditionType

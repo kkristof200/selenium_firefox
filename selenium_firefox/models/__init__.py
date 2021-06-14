@@ -1,4 +1,2 @@
-from .proxy import Proxy
-from .capabilities import Capabilities
+from .firefox_capabilities import FirefoxCapabilities
 from .prefs import Prefs
-from .cookie import Cookie

@@ -1,4 +1,4 @@
-# --------------------------------------------------------------- Imports ---------------------------------------------------------------- #
+# ------------------------------------------------------------ Imports ----------------------------------------------------------- #
 
 # System
 from typing import Optional, Union, List, Tuple
@@ -6,33 +6,33 @@ import os, shutil, time
 
 # Pip
 from noraise import noraise
+from selenium_browser import Browser, AddonInstallSettings, Utils as BrowserUtils
+from kproxy import Proxy
 
 from selenium.webdriver import Firefox as FirefoxWebDriver
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 
+import geckodriver_autoinstaller
+
 # Local
-from .__firefox_core import FirefoxCookies, FirefoxDriverWraps, FirefoxFindFuncs, FirefoxProperties, FirefoxWebelementFunctions
-from .models import Proxy, Capabilities, Prefs
+from .firefox_addons import AddonManager, FoxyProxyAddonSettings
 
-from .addon_install_settings import BaseAddonInstallSettings, FoxyProxyAddonSettings
-from .__resources import Constants
-from .__utils import AddonManager, Utils
+from .__firefox_properties import FirefoxProperties
+from .__constants import Constants
+from .__utils import Utils
 
-# ---------------------------------------------------------------------------------------------------------------------------------------- #
-
+# -------------------------------------------------------------------------------------------------------------------------------- #
 
 
-# ------------------------------------------------------------ class: Firefox ------------------------------------------------------------ #
+
+# -------------------------------------------------------- class: Firefox -------------------------------------------------------- #
 
 class Firefox(
-    FirefoxCookies,
-    FirefoxDriverWraps,
-    FirefoxFindFuncs,
-    FirefoxProperties,
-    FirefoxWebelementFunctions
+    Browser,
+    FirefoxProperties
 ):
 
-    # ------------------------------------------------------------- Init ------------------------------------------------------------- #
+    # --------------------------------------------------------- Init --------------------------------------------------------- #
 
     def __init__(
         self,
@@ -50,7 +50,7 @@ class Firefox(
 
         # addons
         addons_folder_path: Optional[str] = None,
-        addon_settings: Optional[List[BaseAddonInstallSettings]] = None,
+        addon_settings: Optional[List[AddonInstallSettings]] = None,
         # addons - legacy (kept for convenience)
         extensions_folder_path: Optional[str] = None,
 
@@ -85,36 +85,46 @@ class Firefox(
            webdriver_class: override class used to create webdriver (for example: seleniumwire.webdriver.Firefox), Defaults to: 'selenium.webdriver.Firefox'
         '''
 
-        self.default_find_func_timeout = default_find_func_timeout
-        self.pickle_cookies = pickle_cookies
         self.source_profile_path = profile_path
 
-        self.cookies_folder_path = Utils.cookies_folder_path(
-            cookies_folder_path=cookies_folder_path,
-            cookies_id=cookies_id,
-            profile_path=profile_path
-        )
-        os.makedirs(self.cookies_folder_path, exist_ok=True)
+        cookies_folder_path = BrowserUtils.cookies_folder_path(cookies_folder_path, cookies_id, profile_path)
+        os.makedirs(cookies_folder_path, exist_ok=True)
 
-        self._user_agent = Utils.user_agent(
-            user_agent=user_agent,
-            file_path=os.path.join(self.cookies_folder_path, Constants.USER_AGENT_FILE_NAME)
-        )
+        user_agent = BrowserUtils.user_agent(user_agent, BrowserUtils.user_agent_path(cookies_folder_path, cookies_id, profile_path))
 
-        self._proxy = Utils.proxy(
+        proxy = Utils.proxy(
             proxy=proxy,
             host=host,
             port=port
         )
 
-        self.driver = (webdriver_class or FirefoxWebDriver)(
+        addon_settings = addon_settings or []
+
+        if proxy and proxy.needs_auth:
+            addon_settings.append(FoxyProxyAddonSettings())
+
+        super().__init__(
+            webdriver_class or FirefoxWebDriver,
+            cookies_folder_path=cookies_folder_path,
+            cookies_id=cookies_id,
+            pickle_cookies=pickle_cookies,
+            proxy=proxy,
+            default_find_func_timeout=default_find_func_timeout,
+            webdriver_executable_path=Utils.get_geckodriver_path(geckodriver_path),
             firefox_profile=Utils.profile(
-                user_agent=self._user_agent,
+                user_agent=BrowserUtils.user_agent(
+                    user_agent=user_agent,
+                    file_path=BrowserUtils.user_agent_path(
+                        cookies_folder_path=cookies_folder_path,
+                        cookies_id=cookies_id,
+                        profile_path=profile_path
+                    )
+                ),
                 language=language,
                 private=private,
                 disable_images=disable_images,
                 mute_audio=mute_audio,
-                proxy=self._proxy if self._proxy and not self._proxy.needs_auth else None,
+                proxy=proxy if proxy and not proxy.needs_auth else None,
                 path=profile_path
             ),
             firefox_options=Utils.options(
@@ -122,32 +132,24 @@ class Firefox(
                 headless=headless,
                 home_page_url=home_page_url
             ),
-            firefox_binary=FirefoxBinary(
-                firefox_path=firefox_binary_path
-            ) if firefox_binary_path and os.path.exists(firefox_binary_path) else None,
-            **Utils.webdriver_init_path_kwarg(geckodriver_path)
+            firefox_binary=Utils.get_firefox_binary(firefox_binary_path)
         )
 
         if full_screen:
             self.driver.fullscreen_window()
 
-        lib_addon_settings = []
+        am = AddonManager(self)
 
-        if self._proxy and self._proxy.needs_auth:
-            lib_addon_settings.append(FoxyProxyAddonSettings())
-
-        AddonManager.install_addons(
-            firefox=self,
-            addons_settings=Utils.addon_settings(
-                addons_folder_path=addons_folder_path or extensions_folder_path,
-                user_addon_settings=addon_settings,
-                lib_addon_settings=lib_addon_settings
+        am.install_addons(
+            addons_settings=am.get_all_addon_settings(
+                addons_folder_path=addons_folder_path,
+                user_addon_settings=addon_settings
             ),
             temporary=False
         )
 
 
-    # -------------------------------------------------------- Public methods -------------------------------------------------------- #
+    # ---------------------------------------------------- Public methods ---------------------------------------------------- #
 
     @noraise(default_return_value=False)
     def backup_profile(
@@ -187,12 +189,4 @@ class Firefox(
         return os.path.exists(target_profile_path)
 
 
-    # --------------------------------------------------------- Destructor ----------------------------------------------------------- #
-
-    @noraise(print_exc=False)
-    def __del__(self):
-        if os.path.exists(self.driver.profile.path):
-            self.quit()
-
-
-# ---------------------------------------------------------------------------------------------------------------------------------------- #
+# -------------------------------------------------------------------------------------------------------------------------------- #

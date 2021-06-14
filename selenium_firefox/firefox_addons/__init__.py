@@ -6,4 +6,5 @@ from .privacy_badger_addon_settings import PrivacyBadgerAddonSettings
 from .ublock_origin_addon_settings import UBlockOriginAddonSettings
 
 from .builtin_addon_install_settings import BuiltinAddonInstallSettings
-from .builtin_addon_install_settings.base_addon_install_settings import BaseAddonInstallSettings
+
+from .addon_manager import AddonManager
