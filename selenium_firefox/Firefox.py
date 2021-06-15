@@ -80,6 +80,7 @@ class Firefox(
            webdriver_class: override class used to create webdriver (for example: seleniumwire.webdriver.Firefox), Defaults to: 'selenium.webdriver.Firefox'
         '''
 
+        proxy = BrowserUtils.proxy(proxy)
         profile_path, cookies_folder_path, user_agent_file_path = BrowserUtils.get_cache_paths(profile_path, profile_id)
         os.makedirs(cookies_folder_path, exist_ok=True)
 

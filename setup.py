@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="selenium_firefox",
-    version="2.0.6",
+    version="2.0.7",
     author="Kovács Kristóf-Attila",
     description="selenium_firefox",
     long_description=long_description,
