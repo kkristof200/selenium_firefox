@@ -37,16 +37,15 @@ class Firefox(
     def __init__(
         self,
 
+        # profile
+        profile_path: Optional[str] = None,
+        profile_id: Optional[str] = None,
+
         # cookies
-        cookies_folder_path: Optional[str] = None,
-        cookies_id: Optional[str] = None,
         pickle_cookies: bool = False,
 
         # proxy
         proxy: Optional[Union[Proxy, str]] = None,
-        # proxy - legacy (kept for convenience)
-        host: Optional[str] = None,
-        port: Optional[int] = None,
 
         # addons
         addons_folder_path: Optional[str] = None,
@@ -57,7 +56,6 @@ class Firefox(
         # other paths
         geckodriver_path: Optional[str] = None,
         firefox_binary_path: Optional[str] = None,
-        profile_path: Optional[str] = None,
 
         # profile settings
         private: bool = False,
@@ -78,25 +76,14 @@ class Firefox(
         # find function
         default_find_func_timeout: int = 2.5
     ):
-        '''EITHER PROVIDE 'cookies_id' OR  'cookies_folder_path'.
-           IF 'cookies_folder_path' is None, 'cokies_id', will be used to calculate 'cookies_folder_path'
-           IF 'cokies_id' is None, the name of the 'profile_path' follder wil lbe used. if that is Nonne too, 'test' will be used
-
+        '''EITHER PROVIDE 'profile_id' OR  'profile_path'.
            webdriver_class: override class used to create webdriver (for example: seleniumwire.webdriver.Firefox), Defaults to: 'selenium.webdriver.Firefox'
         '''
 
-        self.source_profile_path = profile_path
-
-        cookies_folder_path = BrowserUtils.cookies_folder_path(cookies_folder_path, cookies_id, profile_path)
+        profile_path, cookies_folder_path, user_agent_file_path = BrowserUtils.get_cache_paths(profile_path, profile_id)
         os.makedirs(cookies_folder_path, exist_ok=True)
 
-        user_agent = BrowserUtils.user_agent(user_agent, BrowserUtils.user_agent_path(cookies_folder_path, cookies_id, profile_path))
-
-        proxy = Utils.proxy(
-            proxy=proxy,
-            host=host,
-            port=port
-        )
+        self.source_profile_path = profile_path
 
         addon_settings = addon_settings or []
 
@@ -106,7 +93,6 @@ class Firefox(
         super().__init__(
             webdriver_class or FirefoxWebDriver,
             cookies_folder_path=cookies_folder_path,
-            cookies_id=cookies_id,
             pickle_cookies=pickle_cookies,
             proxy=proxy,
             default_find_func_timeout=default_find_func_timeout,
@@ -114,11 +100,7 @@ class Firefox(
             firefox_profile=Utils.profile(
                 user_agent=BrowserUtils.user_agent(
                     user_agent=user_agent,
-                    file_path=BrowserUtils.user_agent_path(
-                        cookies_folder_path=cookies_folder_path,
-                        cookies_id=cookies_id,
-                        profile_path=profile_path
-                    )
+                    file_path=user_agent_file_path
                 ),
                 language=language,
                 private=private,
