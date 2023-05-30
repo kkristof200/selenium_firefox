@@ -110,7 +110,7 @@ class Firefox(
                 proxy=proxy if proxy and not proxy.needs_auth else None,
                 path=profile_path
             ),
-            firefox_options=Utils.options(
+            options=Utils.options(
                 screen_size=screen_size,
                 headless=headless,
                 home_page_url=home_page_url

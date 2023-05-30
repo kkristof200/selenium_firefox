@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="selenium_firefox",
-    version="2.0.7",
+    version="2.0.8",
     author="Kovács Kristóf-Attila",
     description="selenium_firefox",
     long_description=long_description,
@@ -16,8 +16,9 @@ setuptools.setup(
         'geckodriver-autoinstaller>=0.1.0',
         'kproxy>=0.0.1',
         'noraise>=0.0.16',
-        'selenium>=3.141.0',
-        'selenium-browser>=0.0.12'
+        'selenium>=4.0.0',
+        'selenium-browser>=0.0.12',
+        'setuptools>=67.8.0'
     ],
     classifiers=[
         "Programming Language :: Python :: 3",

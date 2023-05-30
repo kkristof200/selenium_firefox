@@ -46,4 +46,4 @@ time.sleep(999)
 
 ## Dependencies
 
-[geckodriver-autoinstaller](https://pypi.org/project/geckodriver-autoinstaller), [kproxy](https://pypi.org/project/kproxy), [noraise](https://pypi.org/project/noraise), [selenium](https://pypi.org/project/selenium), [selenium-browser](https://pypi.org/project/selenium-browser)
+[geckodriver-autoinstaller](https://pypi.org/project/geckodriver-autoinstaller), [kproxy](https://pypi.org/project/kproxy), [noraise](https://pypi.org/project/noraise), [selenium](https://pypi.org/project/selenium), [selenium-browser](https://pypi.org/project/selenium-browser), [setuptools](https://pypi.org/project/setuptools)
